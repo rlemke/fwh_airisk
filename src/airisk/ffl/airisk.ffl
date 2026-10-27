@@ -1,0 +1,76 @@
+/** The ways AI could harm humanity, and how fast the measured drivers of
+  * each are moving.
+  *
+  * Sources (all open, no key): Epoch AI's notable-models database and
+  * benchmarking hub (compute, training cost, capability index, METR task
+  * horizons, Cybench, Remote Labor Index, GPQA Diamond); Our World in Data's
+  * private-investment series; the AI Incident Database's weekly snapshot,
+  * classified by the MIT AI Risk Repository; the Doomsday Clock's history.
+  * Every file is fetched with the built-in `fw.http.Fetch`, so a refresh
+  * downloads only what changed upstream.
+  *
+  * The site is a self-updating paper and a pace board: for each indicator,
+  * its latest value and its pace now against two years before. No
+  * probability of doom is computed — no data supports one. */
+namespace airisk.data {
+    use fw.http
+
+    /** Every file to fetch. The incident snapshot's URL changes weekly, so it
+      * is resolved here; each snapshot is immutable and stored under its own
+      * name. */
+    event facet Sources() => (sources: Json, count: Int, user_agent: String)
+        with Effect(kind = "external") with Cost(tier = "free")
+
+    /** Fetch one file, reusing the stored copy while upstream says it is current. */
+    facet FetchOne(source: Json, user_agent: String) => (path: String)
+        andThen {
+            got = fw.http.Fetch(
+                url = $.source.url,
+                dest = $.source.dest,
+                max_age_hours = $.source.max_age_hours,
+                user_agent = $.user_agent
+            )
+            yield FetchOne(path = got.path)
+        }
+
+    /** Fetch every source. Paths come back in the same order as `sources`. */
+    facet FetchAll(sources: Json, user_agent: String) => (paths: Json)
+        andThen foreach s in $.sources limit 3 {
+            one = FetchOne(source = $.s, user_agent = $.user_agent)
+            yield FetchAll(paths += one.path)
+        }
+}
+
+namespace airisk.site {
+
+    /** Compute every indicator and its pace, render the paper, the pace board
+      * and the data page, and record this refresh's reading. Pages depend only
+      * on the data, so an unchanged week renders identical bytes. */
+    event facet Build(sources: Json, paths: Json) => (
+        output_dir: String,
+        files: Int,
+        bytes: Long,
+        through: String,
+        summary: Json,
+        accelerating: Json
+    ) with Effect(kind = "io") with Cost(tier = "cheap") with Timeout(minutes = 20)
+}
+
+namespace airisk.workflows {
+    use airisk.data
+    use airisk.site
+
+    /** Fetch every source and rebuild the site (not published; see
+      * airisk.publish.UpdateSite for the scheduled job). */
+    workflow Update() => (output_dir: String, through: String, accelerating: Json, summary: Json) andThen {
+        plan = Sources()
+        fetched = FetchAll(sources = plan.sources, user_agent = plan.user_agent)
+        site = Build(sources = plan.sources, paths = fetched.paths)
+        yield Update(
+            output_dir = site.output_dir,
+            through = site.through,
+            accelerating = site.accelerating,
+            summary = site.summary
+        )
+    }
+}

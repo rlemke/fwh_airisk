@@ -1,0 +1,23 @@
+{% macro verdict(v) %}<span class="v v-{{ v.split(' ')[0] }}">{{ v }}</span>{% endmacro %}
+
+{% macro pct(x, digits=0) %}{{ ("%." ~ digits ~ "f")|format(x * 100) }}%{% endmacro %}
+
+{% macro legend_series(ind) %}
+<div class="legend">
+  <span><i style="background:var(--s0)"></i>every model measured</span>
+  <span><i style="background:var(--s1)"></i>best so far</span>
+  {% if ind.recent != '—' %}<span><i style="background:var(--s2)"></i>pace, last {{ ind.years|int }} year{{ 's' if ind.years != 1 }}</span>{% endif %}
+  {% if ind.prior != '—' %}<span><i style="background:var(--s4)"></i>pace, the {{ ind.years|int }} year{{ 's' if ind.years != 1 }} before</span>{% endif %}
+  {% if ind.log and ind.recent_rate and ind.recent_rate > 0 %}<span><i style="background:var(--s2);opacity:.6"></i>dashed: the recent pace continued (not a forecast)</span>{% endif %}
+</div>
+{% endmacro %}
+
+{% macro milestones(ind) %}
+{% if ind.milestones %}
+<table class="dtable"><thead><tr><th>If the recent pace held</th><th class="num">Trend line reaches it</th></tr></thead><tbody>
+{% for m in ind.milestones %}
+<tr><td>{{ m.label }}</td><td class="num">{% if m.overdue %}{{ m.when }} <span class="t">— already passed on the line; no model measured there yet</span>{% else %}{{ m.when }}{% endif %}</td></tr>
+{% endfor %}
+</tbody></table>
+{% endif %}
+{% endmacro %}

@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}AI Risk Clock{% endblock %}</title>
+<meta name="description" content="The ways AI could harm humanity, and the measured indicators behind each one — compute, capability, autonomy, cyber skill, paid work, investment, reported incidents and expert surveys — with the pace of each, refreshed from open data.">
+<style>
+:root{
+  --bg:#f6f7f9; --surface:#fff; --surface-2:#f1f3f6; --surface-3:#e4e8ee; --border:#dde2e8; --border-strong:#b9c1cc;
+  --text:#14181f; --text-2:#3c4552; --muted:#677283; --accent:#1f6fd1;
+  --s0:#9aa4b2; --s1:#2a78d6; --s2:#eb6834; --s3:#c22c2c; --s4:#7a4fc8; --s5:#1f9e89; --s6:#c99a06; --s7:#5b6573;
+  --good:#006300; --bad:#c22c2c; --warn:#a15c00;
+  --r-sm:5px; --r-md:8px; --r-lg:10px;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; --serif:Charter,"Iowan Old Style",Georgia,serif; --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1217; --surface:#161a21; --surface-2:#1c212a; --surface-3:#2a313c; --border:#2a313b; --border-strong:#46505e;
+    --text:#e8ebf0; --text-2:#c2c8d2; --muted:#8c96a5; --accent:#5aa2f5;
+    --s0:#5d6776; --s1:#4b93ea; --s2:#f07a45; --s3:#ec5f5f; --s4:#a183e6; --s5:#3cc1aa; --s6:#e2b52c; --s7:#8d96a3;
+    --good:#3fbf3f; --bad:#ec5f5f; --warn:#e2a03a;
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 var(--sans)}
+a{color:var(--accent)}
+header.top{background:var(--surface);border-bottom:1px solid var(--border)}
+header.top .in,main,footer .in{max-width:1120px;margin:0 auto;padding:0 16px}
+header.top .in{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;min-height:52px}
+header.top .brand{font-weight:700;font-size:16px;color:var(--text);text-decoration:none;letter-spacing:-.01em}
+header.top nav{display:flex;gap:.2rem;flex-wrap:wrap}
+header.top nav a{color:var(--text-2);text-decoration:none;padding:.35rem .6rem;border-radius:var(--r-sm);font-weight:500}
+header.top nav a:hover,header.top nav a.cur{background:var(--surface-2);color:var(--text)}
+header.top .asof{margin-left:auto;font-size:12px;color:var(--muted)}
+main{padding-top:1.2rem;padding-bottom:1.5rem}
+h1.page{font-size:26px;margin:0 0 .3rem;letter-spacing:-.02em;line-height:1.2}
+.lede{color:var(--text-2);max-width:760px;margin:0 0 1.2rem}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
+.panel-head{display:flex;align-items:baseline;gap:.8rem;flex-wrap:wrap;padding:.75rem 1rem;border-bottom:1px solid var(--border)}
+.panel-head h2{margin:0;font-size:16px}
+.pad{padding:.85rem 1rem}
+.section{margin-bottom:1.2rem}
+.t{font-size:12px;color:var(--muted)}
+.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.dtable{width:100%;border-collapse:collapse;font-size:13.5px}
+.dtable th{font:600 10.5px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:left;padding:.5rem .7rem;border-bottom:1px solid var(--border);white-space:nowrap}
+.dtable td{padding:.5rem .7rem;border-bottom:1px solid var(--border);vertical-align:top}
+.dtable tr:last-child td{border-bottom:0}
+.overflow-x{overflow-x:auto}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr));gap:1.2rem}
+.v{display:inline-block;font:600 11px/1 var(--mono);text-transform:uppercase;letter-spacing:.04em;padding:.28rem .45rem;border-radius:var(--r-sm);white-space:nowrap}
+.v-accelerating{background:color-mix(in srgb,var(--bad) 16%,transparent);color:var(--bad)}
+.v-steady{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
+.v-slowing,.v-reversing{background:color-mix(in srgb,var(--good) 16%,transparent);color:var(--good)}
+.v-too{background:var(--surface-2);color:var(--muted)}
+.hero{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:1.2rem;align-items:start}
+@media (max-width:760px){.hero{grid-template-columns:1fr}}
+.clockbox{text-align:center}
+.clockbox .big{font-size:28px;font-weight:700;letter-spacing:-.02em;margin-top:.3rem}
+svg.clock{width:200px;height:200px}
+svg.clock .face{fill:var(--surface-2);stroke:var(--border-strong);stroke-width:2}
+svg.clock .zone{fill:color-mix(in srgb,var(--bad) 18%,transparent)}
+svg.clock .tick{stroke:var(--muted);stroke-width:1}
+svg.clock .tick.major{stroke:var(--text-2);stroke-width:2}
+svg.clock .hand{stroke:var(--bad);stroke-width:3.5;stroke-linecap:round}
+svg.clock .hand.hour{stroke:var(--text);stroke-width:5}
+svg.clock .hub{fill:var(--text)}
+svg.chart{width:100%;height:auto;display:block}
+svg.chart text{fill:var(--muted);font:10.5px var(--mono)}
+svg.chart .grid{stroke:var(--border);stroke-width:1}
+svg.chart .axis{stroke:var(--border-strong);stroke-width:1}
+svg.chart .ref{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3}
+svg.chart text.reft{fill:var(--text-2)}
+svg.chart .ln{fill:none;stroke-width:2}
+svg.chart .dot{stroke:none}
+{% for i in range(8) %}svg.chart .s{{ i }}.ln{stroke:var(--s{{ i }})} svg.chart .s{{ i }}.dot,svg.chart .s{{ i }}.bar{fill:var(--s{{ i }})}
+{% endfor %}
+svg.chart .s0.dot{opacity:.55}
+svg.chart .bar.part{opacity:.55}
+svg.chart .fit{stroke:var(--s2);stroke-width:2.2}
+svg.chart .fit.prior{stroke:var(--s4);stroke-width:2.2}
+svg.chart .proj{stroke:var(--s2);stroke-width:1.6;stroke-dasharray:5 4;opacity:.8}
+svg.spark{width:110px;height:28px;display:block}
+svg.spark polyline{fill:none;stroke:var(--s1);stroke-width:1.6}
+.legend{display:flex;flex-wrap:wrap;gap:.3rem 1rem;font-size:12px;color:var(--text-2);padding:.2rem 1rem .8rem}
+.legend i{display:inline-block;width:12px;height:3px;border-radius:2px;margin-right:.35rem;vertical-align:middle}
+.legend i.sq{height:10px;width:10px}
+.board td.val{font-weight:600}
+.board .q{color:var(--muted);font-size:12px}
+.paper{max-width:760px;margin:0 auto;font:17px/1.65 var(--serif)}
+.paper h2{font:700 22px/1.3 var(--sans);margin:2.2rem 0 .6rem;letter-spacing:-.01em}
+.paper h3{font:700 17px/1.3 var(--sans);margin:1.6rem 0 .4rem}
+.paper p{margin:.6rem 0}
+.paper .fig{margin:1.2rem -1rem;font-family:var(--sans)}
+@media (max-width:760px){.paper .fig{margin:1.2rem 0}}
+.paper .fig .cap{font-size:13px;color:var(--muted);padding:.5rem 1rem .8rem;line-height:1.45}
+.paper .callout{font:14px/1.55 var(--sans);background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--s1);border-radius:var(--r-md);padding:.8rem 1rem;margin:1rem 0}
+.paper .reading{font:14px/1.55 var(--sans);background:var(--surface-2);border-radius:var(--r-md);padding:.7rem .9rem;margin:.8rem 0}
+.paper ol.refs{font:13.5px/1.5 var(--sans);padding-left:1.2rem}
+.paper ol.refs li{margin:.35rem 0}
+.paper .abstract{font:16px/1.6 var(--sans);color:var(--text-2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:.9rem 0;margin:1rem 0 1.4rem}
+.toc{font:14px/1.6 var(--sans);columns:2;column-gap:2rem}
+@media (max-width:600px){.toc{columns:1}}
+.note{font-size:13px;color:var(--text-2);line-height:1.55;padding:.8rem 1rem;border:1px solid var(--border);background:var(--surface-2);border-radius:var(--r-md);margin-top:1rem}
+.note b{color:var(--text)}
+footer{border-top:1px solid var(--border);color:var(--muted);font-size:12px;padding:1rem 0 2rem}
+footer a{color:var(--muted)}
+.ind-head{display:flex;gap:.8rem;align-items:center;flex-wrap:wrap}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.6rem 1rem;padding:.8rem 1rem;border-top:1px solid var(--border);font-size:13px}
+.kv .k{font:600 10.5px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+</style>
+</head>
+<body>
+<header class="top"><div class="in">
+  <a class="brand" href="index.html">AI Risk Clock</a>
+  <nav>
+    <a href="index.html"{% if page == 'index.html' %} class="cur"{% endif %}>The clock</a>
+    <a href="paper.html"{% if page == 'paper.html' %} class="cur"{% endif %}>The paper</a>
+    <a href="data.html"{% if page == 'data.html' %} class="cur"{% endif %}>The data</a>
+  </nav>
+  <span class="asof">Data through {{ through_label }}</span>
+</div></header>
+<main>
+{% block content %}{% endblock %}
+</main>
+<footer><div class="in">
+  Built from open data — Epoch AI, METR (via Epoch AI), Our World in Data / Stanford AI Index, the AI Incident Database with the MIT AI Risk Repository taxonomy, the Bulletin of the Atomic Scientists (via Wikipedia) and AI Impacts.
+  Recomputed on every refresh; the text of the paper is filled in from the same numbers. Nothing here is a forecast of doom: see <a href="paper.html#no-number">why there is no single number</a>.
+  Source: <a href="https://github.com/rlemke/fwh_airisk">fwh_airisk</a>.
+</div></footer>
+</body>
+</html>

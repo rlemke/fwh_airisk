@@ -1,0 +1,43 @@
+{
+  "_about": "Published results of the Expert Survey on Progress in AI (ESPAI), run by AI Impacts among authors at top machine-learning venues. Numbers are copied from the survey write-ups cited per entry; nothing here is computed. Question wording changed between rounds (noted per entry), so the series is indicative, not a like-for-like time series. Add a new round as a new object; the site picks it up on the next build.",
+  "rounds": [
+    {
+      "year": 2016,
+      "fielded": "2016-05/2016-06",
+      "respondents": 352,
+      "extremely_bad_median": 0.05,
+      "extremely_bad_mean": null,
+      "hlmi_50_year": 2061,
+      "wording": "Long-run effect of high-level machine intelligence: 'extremely bad (e.g. human extinction)'.",
+      "citation": "Grace, Salvatier, Dafoe, Zhang & Evans (2018), 'When Will AI Exceed Human Performance? Evidence from AI Experts', Journal of Artificial Intelligence Research 62.",
+      "url": "https://arxiv.org/abs/1705.08807"
+    },
+    {
+      "year": 2022,
+      "fielded": "2022-06/2022-08",
+      "respondents": 738,
+      "extremely_bad_median": 0.05,
+      "extremely_bad_mean": 0.14,
+      "share_at_least_10pct": 0.48,
+      "hlmi_50_year": 2059,
+      "wording": "Same question as 2016. AI Impacts' later re-aggregation put the 50% HLMI year for this round at 2060.",
+      "citation": "AI Impacts (2022), '2022 Expert Survey on Progress in AI'.",
+      "url": "https://aiimpacts.org/2022-expert-survey-on-progress-in-ai/"
+    },
+    {
+      "year": 2023,
+      "fielded": "2023-10-15/2023-10-24",
+      "respondents": 2778,
+      "extremely_bad_median": 0.05,
+      "extremely_bad_mean": 0.09,
+      "extinction_or_disempowerment_median": 0.05,
+      "extinction_or_disempowerment_mean": 0.162,
+      "loss_of_control_median": 0.10,
+      "share_at_least_10pct_range": [0.378, 0.514],
+      "hlmi_50_year": 2047,
+      "wording": "Same long-run question (median 5%, mean 9%), plus new questions on extinction or permanent severe disempowerment (median 5%, mean 16.2%) and on human inability to control AI (median 10%, mean 19.4%).",
+      "citation": "Grace, Stewart, Sandkühler, Thomas, Weinstein-Raun & Brauner (2024), 'Thousands of AI Authors on the Future of AI'.",
+      "url": "https://arxiv.org/abs/2401.02843"
+    }
+  ]
+}

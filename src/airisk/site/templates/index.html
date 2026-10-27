@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% import "macros.html" as m %}
+{% block title %}AI Risk Clock{% endblock %}
+{% block content %}
+<section class="hero section">
+  <div>
+    <h1 class="page">How fast are the drivers of AI risk moving?</h1>
+    <p class="lede">
+      Nobody can measure the probability that AI destroys humanity. What can be measured is how quickly the things that would drive such a catastrophe are changing: how powerful AI systems are, how long they work without supervision, how good they are at hacking, how much paid work they can do, how much money is racing in, and how many harms are already being reported.
+      This board tracks {{ board|length }} of those indicators from open data and asks of each one what you would ask of a clock: <b>is it moving faster or slower than it was?</b>
+    </p>
+    <div class="panel pad" style="font-size:14px">
+      <b>Right now:</b>
+      {{ accelerating|length }} of {{ board|length }} indicators are <span class="v v-accelerating">accelerating</span>
+      {%- if accelerating %} ({% for v in accelerating %}{{ v.title }}{% if not loop.last %}, {% endif %}{% endfor %}){% endif %},
+      {{ slowing|length }} {{ 'is' if slowing|length == 1 else 'are' }} <span class="v v-slowing">slowing</span>{% if slowing %} ({% for v in slowing %}{{ v.title }}{% if not loop.last %}, {% endif %}{% endfor %}){% endif %}, and the rest are steady or too new to call.
+      AI researchers surveyed in {{ surveys.latest.year }} put a median {{ m.pct(surveys.latest.extremely_bad_median) }} chance on an outcome as bad as human extinction.
+      <a href="paper.html">Read the paper</a> for what each indicator means and what it cannot tell you.
+    </div>
+  </div>
+  <div class="panel pad clockbox">
+    <div class="t" style="text-transform:uppercase;letter-spacing:.06em;font-weight:600">Doomsday Clock {{ clock.year }}</div>
+    {{ clock.face }}
+    <div class="big">{{ clock.current }}</div>
+    <div class="t">to midnight{% if clock.closest_before and clock.current_seconds < clock.closest_before.seconds %} — the closest it has ever been{% endif %}. Set by the Bulletin of the Atomic Scientists, whose reasons now include advancing technologies such as AI. <a href="data.html#clock">History</a></div>
+  </div>
+</section>
+
+<section class="panel section">
+  <div class="panel-head"><h2>The pace board</h2><span class="t">Pace now vs the window before it. Accelerating = at least {{ ((trend_cfg.faster - 1) * 100)|round|int }}% faster; slowing = at least {{ ((1 - trend_cfg.slower) * 100)|round|int }}% slower.</span></div>
+  <div class="overflow-x">
+  <table class="dtable board">
+    <thead><tr><th>Indicator</th><th>Risk pathway</th><th class="num">Latest best</th><th>Pace now</th><th>Pace before</th><th>Trend</th><th></th></tr></thead>
+    <tbody>
+    {% for v in board %}
+      <tr>
+        <td><a href="data.html#{{ v.key }}">{{ v.title }}</a><div class="q">{{ v.question }}</div></td>
+        <td class="t">{{ v.pathway_name }}</td>
+        <td class="num val">{{ v.latest_value }}<div class="t">{{ v.latest_date }}</div></td>
+        <td>{{ v.recent }}<div class="t">last {{ v.years|int }} yr{{ 's' if v.years != 1 }}</div></td>
+        <td class="t">{{ v.prior }}</td>
+        <td>{{ m.verdict(v.verdict) }}</td>
+        <td>{{ v.spark }}</td>
+      </tr>
+    {% endfor %}
+      <tr>
+        <td><a href="data.html#incidents">Reported AI incidents</a><div class="q">How many harms from AI are being reported, and of what kind?</div></td>
+        <td class="t">Harms already happening</td>
+        <td class="num val">{{ "{:,}".format(incidents.last_full_total) }}<div class="t">in {{ incidents.last_full }}</div></td>
+        <td>{% if incidents.growth3 is not none %}{{ "%+.0f"|format(incidents.growth3 * 100) }}% a year<div class="t">{{ incidents.last_full - 3 }}–{{ incidents.last_full }}</div>{% else %}—{% endif %}</td>
+        <td class="t">{% if incidents.ytd %}{{ incidents.ytd[0] }} so far in {{ incidents.partial }} vs {{ incidents.ytd[1] }} by this date last year (reports lag){% endif %}</td>
+        <td><span class="v v-too">see note</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<div class="grid2 section">
+<section class="panel">
+  <div class="panel-head"><h2>When the trend lines cross the next milestones</h2></div>
+  <div class="pad t" style="padding-bottom:0">The recent pace, continued. Trends bend — power, chips, data and money all limit them — so read these as "where the current speed points", never as predictions.</div>
+  <table class="dtable">
+    <thead><tr><th>Indicator</th><th>Milestone</th><th class="num">Trend line reaches it</th></tr></thead>
+    <tbody>
+    {% for v in board if v.milestones %}{% for ms in v.milestones %}
+      <tr><td>{{ v.title if loop.first else '' }}</td><td>{{ ms.label }}</td>
+        <td class="num">{{ ms.when }}{% if ms.overdue %}<div class="t">passed on the line; not yet measured</div>{% endif %}</td></tr>
+    {% endfor %}{% endfor %}
+    </tbody>
+  </table>
+</section>
+<section class="panel">
+  <div class="panel-head"><h2>Harms already being reported</h2><span class="t">AI Incident Database, by MIT risk domain</span></div>
+  {{ incidents.chart }}
+  <div class="legend">{% for cls, c in incidents.cats %}<span><i class="sq" style="background:var(--{{ cls }})"></i>{{ c }}</span>{% endfor %}<span><i class="sq" style="background:var(--s0)"></i>not yet classified</span></div>
+  <div class="pad t" style="padding-top:0">{{ incidents.partial }} is partial (faded). Counts are reports, not a measured rate of harm: they rise with attention as well as with harm.</div>
+</section>
+</div>
+
+<section class="panel section">
+  <div class="panel-head"><h2>The six pathways</h2><span class="t">How AI could harm humanity, and which indicators bear on each</span></div>
+  <div class="grid2 pad">
+  {% for key, (name, what) in pathways.items() %}
+    <div><b>{{ name }}</b><div class="t" style="margin:.15rem 0 .35rem">{{ what }}</div>
+      {% for v in by_pathway[key] %}<div style="font-size:13px"><a href="data.html#{{ v.key }}">{{ v.title }}</a> — {{ v.latest_value }} {{ m.verdict(v.verdict) }}</div>{% endfor %}
+    </div>
+  {% endfor %}
+  </div>
+</section>
+
+<div class="note"><b>How to read this.</b> Every number is recomputed from the sources on each refresh. "Latest best" is the best model measured so far; "pace" is a straight-line fit (on a log scale for things that grow by multiplying) over the last window, compared with the window before. A board full of red does not mean doom is near, and a green one does not mean safety: it says how fast the inputs to the risk are moving. Safety research, regulation and safeguards are not on the board because no open dataset tracks them over time — <a href="paper.html#missing">the paper says what is missing</a>.</div>
+{% endblock %}

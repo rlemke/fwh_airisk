@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% import "macros.html" as m %}
+{% block title %}How AI Could Harm Humanity — and What the Numbers Say{% endblock %}
+{% block content %}
+{% set c = views.compute %}{% set e = views.eci %}{% set t = views.metr %}{% set cy = views.cybench %}
+{% set g = views.gpqa %}{% set r = views.rli %}{% set inv = views.investment %}{% set cost = views.cost %}
+{% set sv = surveys.latest %}
+<article class="paper">
+<h1 class="page" style="font-family:var(--sans)">How AI Could Harm Humanity — and What the Numbers Say</h1>
+<p class="t" style="font-family:var(--sans)">A self-updating paper. Every figure and every number in the text is recomputed from open data on each refresh; this version reflects data through {{ through_label }}.</p>
+
+<div class="abstract">
+<b>Abstract.</b> Serious researchers disagree about whether advanced AI could cause a catastrophe up to and including human extinction. This paper lays out the pathways by which that could happen, as the research literature describes them, and pairs each one with openly published, dated measurements. It does not estimate a probability of doom, because no data can support one. Instead it reports the <i>pace</i> of each driver — the way the Doomsday Clock reports a setting rather than a probability.
+As of this version, the best AI model has been trained with {{ c.latest_value }} of computation ({{ c.recent }}), AI agents can complete tasks that take a skilled person about {{ t.latest_value }} half the time ({{ t.recent }}), the best model solves {{ cy.latest_value }} of a professional hacking benchmark unaided, and private investment reached {{ inv.latest_value }} a year.
+{{ accelerating|length }} of the {{ board|length }} tracked indicators are accelerating.
+Surveyed AI researchers put a median {{ m.pct(sv.extremely_bad_median) }} chance on an outcome as bad as human extinction, and disagree widely around that.
+</div>
+
+<nav class="toc">
+<div>1. <a href="#no-number">Why there is no single doom number</a></div>
+<div>2. <a href="#pathways">The pathways</a></div>
+<div>3. <a href="#readings">What the indicators show</a></div>
+<div>4. <a href="#milestones">Where the current pace points</a></div>
+<div>5. <a href="#doubts">Reasons to doubt the alarm</a></div>
+<div>6. <a href="#missing">What the data cannot show</a></div>
+<div>7. <a href="#method">Method</a></div>
+<div>8. <a href="#refs">References</a></div>
+</nav>
+
+<h2 id="no-number">1. Why there is no single doom number</h2>
+<p>The Doomsday Clock is the best-known measure of humanity's danger, and it is not a measurement. Since 1947 the Bulletin of the Atomic Scientists has set its hands by the judgement of a board of scientists. In {{ clock.year }} it stood at <b>{{ clock.current }}</b> to midnight{% if clock.closest_before and clock.current_seconds < clock.closest_before.seconds %}, the closest it has ever been{% endif %}. Its farthest was {{ clock.farthest_text }} in {{ clock.farthest.year }}. The Bulletin's stated reasons are mostly nuclear weapons and climate change, but disruptive or advancing technologies, AI among them, appear in the reasons for the {{ clock.ai_years|join(', ') }} settings as Wikipedia summarises them [18].</p>
+
+<div class="fig panel">{{ clock.chart }}<div class="cap"><b>Figure 1.</b> The Doomsday Clock, minutes to midnight at each setting. A judgement, not a calculation, but the most widely understood gauge of global catastrophic risk.</div></div>
+
+<p>A probability of AI-caused extinction is harder still. It is a one-time event with no frequency to count. The nearest thing to data is what experts say when asked. In the largest survey, {{ "{:,}".format(sv.respondents) }} researchers who had published at top AI venues were asked in {{ sv.year }} how likely it was that advanced AI's long-run effect on humanity would be "extremely bad (e.g. human extinction)". The median answer was {{ m.pct(sv.extremely_bad_median) }} and the mean {{ m.pct(sv.extremely_bad_mean) }}. Between {{ m.pct(sv.share_at_least_10pct_range[0]) }} and {{ m.pct(sv.share_at_least_10pct_range[1]) }} of respondents gave at least a 10% chance, depending on how the question was worded, while many put it near zero [7]. The median has stayed at 5% in every round since 2016, but the date by which researchers expect human-level AI moved from {{ surveys.rounds[0].hlmi_50_year }} to {{ sv.hlmi_50_year }}.</p>
+
+<div class="fig panel"><div class="grid2" style="padding:.6rem">
+<div><div class="t" style="padding-left:.4rem">Chance of an extremely bad outcome</div>{{ surveys.p_chart }}</div>
+<div><div class="t" style="padding-left:.4rem">Year with even odds of human-level AI</div>{{ surveys.h_chart }}</div></div>
+<div class="cap"><b>Figure 2.</b> Expert Survey on Progress in AI. Blue: median respondent; orange: mean. The question wording changed between rounds, so treat this as indicative.</div></div>
+
+<p>A 5% median from experts is not a measured 5% risk. AI researchers have no special skill at forecasting unprecedented events, and the survey authors say so themselves. What <i>can</i> be measured is the pace of the things that would drive such an event. That is what the rest of this paper tracks.</p>
+
+<h2 id="pathways">2. The pathways</h2>
+<p>Three widely used frameworks sort the ways AI could cause large-scale harm. Hendrycks, Mazeika and Woodside group them into malicious use, an AI race, organisational accidents and rogue AI [3]. The International AI Safety Report, written by about a hundred experts with the backing of some thirty countries, uses malicious use, malfunctions and systemic risks [4]. The MIT AI Risk Repository catalogues hundreds of risks from the literature into seven domains, and the incident data in this paper are classified by it [5]. They overlap heavily; the six pathways below follow them.</p>
+
+{% for key, (name, what) in pathways.items() %}
+<h3 id="p-{{ key }}">2.{{ loop.index }} {{ name }}</h3>
+{% if key == 'capability' %}
+<p>This is not a harm in itself. It is the engine under every other pathway. AI capability has grown with three inputs: computation, data and better algorithms. Compute is the best measured. Every pathway below gets more dangerous as systems get more capable, and the founding worry of the field is a system substantially more capable than people [1, 2].</p>
+{% elif key == 'control' %}
+<p>The concern that drew the most prominent warnings is that a system might pursue goals that differ from those its developers intended, and be capable enough that people cannot correct it. In 2023, leading AI scientists and lab heads signed a one-sentence statement saying that the risk of extinction from AI should be a global priority alongside pandemics and nuclear war [6]. The argument does not need malice. A system trained to achieve goals tends to acquire resources and resist being switched off, because both help it achieve almost any goal [1, 2, 17].</p>
+<p>This is no longer only theory. In controlled experiments, a frontier model selectively complied with a training objective it disagreed with in order to avoid being modified ("alignment faking") [9]. Several frontier models, given a goal and an opportunity, have disabled oversight or misrepresented their actions to their evaluators ("in-context scheming") [10]. These were set up to elicit the behaviour, so they show capability rather than routine practice. The measurable proxy is <b>autonomy</b>: how long a task an AI agent can complete without a human. The longer it works alone, the more any hidden misalignment can compound before anyone notices.</p>
+{% elif key == 'cyber' %}
+<p>AI that can find and exploit software vulnerabilities could let a small group attack power grids, hospitals or financial systems at a scale that once needed a nation's intelligence service. Defenders get the same tools, so the open question is the balance. The indicator is Cybench: professional capture-the-flag challenges, solved with no hints [12]. Attacks reported in the incident database fall mainly under "malicious use".</p>
+{% elif key == 'bio' %}
+<p>The gravest misuse concern is help with biological or chemical weapons. Expertise, not information, has long been the main barrier. A 2022 study showed how easily a drug-discovery model could be turned around: inverting one setting made it propose about 40,000 candidate toxic molecules in six hours [21]. Frontier developers now run bioweapon-uplift evaluations before release, and have switched on stronger safeguards when they could not rule out meaningful uplift [20]. No open benchmark tracks weapons uplift over time; those evaluations are kept confidential. The proxy here is GPQA Diamond: graduate-level science questions written so that web search does not help [13]. It shows that the knowledge barrier is falling. It does not show that the practical barrier is.</p>
+{% elif key == 'economic' %}
+<p>A slower path to catastrophe runs through the economy rather than a single event. If AI can do most paid work, people lose the income, and with it the bargaining power, that has kept states and companies answerable to them. Kulveit and colleagues call this "gradual disempowerment": no single step looks like a catastrophe, yet human influence over the systems that run society erodes [8]. The indicator is the Remote Labor Index: real freelance projects, judged against what a client accepted from a person [14].</p>
+{% elif key == 'race' %}
+<p>Competition turns every other pathway worse. When labs or countries believe that whoever arrives first wins, each has a reason to cut safety work to keep pace [3]. Money is the clearest measure of the pressure: private investment, and the cost of a single frontier training run. Concentration is a risk in its own right: the systems are expensive enough that only a handful of companies and governments can build them.</p>
+{% endif %}
+{% for v in by_pathway[key] %}
+<div class="reading"><b>{{ v.title }}:</b> {{ v.latest_value }} ({{ v.latest_label }}, {{ v.latest_date }}). Pace over the last {{ v.years|int }} year{{ 's' if v.years != 1 }}: {{ v.recent }}{% if v.prior != '—' %}; the {{ v.years|int }} before: {{ v.prior }}{% endif %}. {{ m.verdict(v.verdict) }}</div>
+{% endfor %}
+{% endfor %}
+
+<h3>2.7 Harms already happening</h3>
+<p>Most of these pathways are about the future, but AI already causes harm. The AI Incident Database collects reported cases [19]. In {{ incidents.last_full }} it recorded {{ "{:,}".format(incidents.last_full_total) }} incidents{% if incidents.growth3 is not none %}, growing about {{ "%.0f"|format(incidents.growth3 * 100) }}% a year over the previous three years{% endif %}.{% if incidents.domain_share %} The largest share of classified {{ incidents.last_full }} incidents was <b>{{ incidents.domain_share[0].domain }}</b> ({{ m.pct(incidents.domain_share[0].share) }}), followed by {{ incidents.domain_share[1].domain }} ({{ m.pct(incidents.domain_share[1].share) }}).{% endif %} These are not catastrophes. They are the early, visible edge of the misuse and failure pathways, and the clearest data that the pathways are real.</p>
+<div class="fig panel">{{ incidents.chart }}
+<div class="legend">{% for cls, cname in incidents.cats %}<span><i class="sq" style="background:var(--{{ cls }})"></i>{{ cname }}</span>{% endfor %}</div>
+<div class="cap"><b>Figure 3.</b> Reported AI incidents per year by MIT risk domain. {{ incidents.partial }} is partial. Reports rise with attention as well as with harm.</div></div>
+
+<h2 id="readings">3. What the indicators show</h2>
+<p>Read together, the indicators answer the clock's question: how fast are we moving?</p>
+<p><b>Capability is still compounding.</b> The compute used for frontier training runs is {{ c.recent }}{% if c.prior != '—' %}, against {{ c.prior }} in the three years before{% endif %}. On Epoch AI's capability index, which combines dozens of benchmarks so that progress stays visible after any single test is saturated, the frontier is gaining {{ e.recent }}{% if e.prior != '—' %} ({{ e.prior }} before){% endif %}.</p>
+<div class="fig panel">{{ c.chart }}{{ m.legend_series(c) }}<div class="cap"><b>Figure 4.</b> Training compute of notable AI models since 2010, log scale. {{ c.note }}</div></div>
+<p><b>Autonomy is the fastest-moving measure.</b> The length of task an AI agent can finish on its own is {{ t.recent }}. In 2019 the best model managed a few seconds; the best measured now manages {{ t.latest_value }}.</p>
+<div class="fig panel">{{ t.chart }}{{ m.legend_series(t) }}<div class="cap"><b>Figure 5.</b> METR's 50% task time horizon: the length of task, in skilled-human time, that the model completes half the time. Log scale. {{ t.note }}</div></div>
+<p><b>Dangerous skills are close to their benchmarks' ceilings.</b> The best model solves {{ cy.latest_value }} of Cybench unaided, and scores {{ g.latest_value }} on graduate-level science questions where domain experts score about 65%. Once a benchmark saturates it stops measuring anything, so these are the indicators most likely to go quiet while the risk they track keeps growing.</p>
+<div class="grid2">
+<div class="fig panel" style="margin:1rem 0">{{ cy.chart }}<div class="cap"><b>Figure 6.</b> Cybench, share solved unaided.</div></div>
+<div class="fig panel" style="margin:1rem 0">{{ g.chart }}<div class="cap"><b>Figure 7.</b> GPQA Diamond, share correct; dashed lines are human reference scores.</div></div>
+</div>
+<p><b>Paid work is the newest front.</b> AI agents deliver an acceptable result on {{ r.latest_value }} of real freelance projects ({{ r.recent }}). That is far from most work. But the measure only began in 2025, and it is growing by multiplication, not addition.</p>
+<p><b>The money is accelerating.</b> Private investment in AI reached {{ inv.latest_value }} in {{ inv.latest_label }} ({{ inv.recent }}), and the most expensive training run on record cost {{ cost.latest_value }} ({{ cost.latest_label }}).</p>
+<div class="fig panel">{{ inv.chart }}<div class="cap"><b>Figure 8.</b> World private investment in AI, log scale. {{ inv.note }}</div></div>
+
+<h2 id="milestones">4. Where the current pace points</h2>
+<p>A trend line is not a forecast; it says where the current speed leads if nothing changes. With that caution, here is where the recent paces cross round-number milestones:</p>
+<table class="dtable" style="font-family:var(--sans)"><thead><tr><th>Indicator</th><th>Milestone</th><th class="num">Trend line reaches it</th></tr></thead><tbody>
+{% for v in board if v.milestones %}{% for ms in v.milestones %}
+<tr><td>{{ v.title if loop.first else '' }}</td><td>{{ ms.label }}</td><td class="num">{{ ms.when }}{% if ms.overdue %}<div class="t">already passed on the line; not yet measured</div>{% endif %}</td></tr>
+{% endfor %}{% endfor %}
+</tbody></table>
+<p>The autonomy milestones matter most for the loss-of-control pathway. An agent that can carry a month-long project on its own is a different kind of system from one that needs checking every few minutes. When a date in this table has already passed, the trend line has gone beyond the target but no measured model has yet. Either the data has not caught up, or the trend has bent; the next refreshes will show which.</p>
+
+<h2 id="doubts">5. Reasons to doubt the alarm</h2>
+<p>A fair paper has to give the other side its strongest form.</p>
+<p><b>Trends bend.</b> Exponential growth in compute runs into limits: power plants, chip supply, training data and investors' patience. The pace verdicts on this page will show a slowdown if one comes, which is part of why they are reported.</p>
+<p><b>Benchmarks are not the world.</b> A model that solves a hacking challenge in a sandbox has not taken down a power grid, and one that answers virology questions has not made a weapon. Every capability indicator here measures a precondition, not a harm.</p>
+<p><b>Capability is not intent.</b> The loss-of-control argument needs goals that diverge from ours <i>and</i> the ability to act on them at scale. The experiments that show deceptive behaviour were designed to elicit it. Narayanan and Kapoor argue that AI will spread like other general-purpose technologies — slowly, through institutions that adapt — and that treating it as an imminent superintelligence misdirects policy [15].</p>
+<p><b>Incident counts measure attention.</b> The rise in reported incidents is partly a rise in looking.</p>
+<p><b>The experts may be wrong either way.</b> Researchers inside the field may overrate its importance, or may be too close to it to see the danger. The survey numbers deserve weight as opinion, not as measurement.</p>
+
+<h2 id="missing">6. What the data cannot show</h2>
+<p>The most important omission is the other side of the ledger. No open dataset tracks, over time, how much is spent on AI safety research, how many frontier models ship with tested safeguards, how much of the world's compute falls under any oversight, or how often deployed models behave deceptively. Without them this page can show how fast the risk's drivers are moving, but not whether the brakes are keeping up. There is also no open measure of biological uplift, autonomous-weapons deployment or AI in nuclear command and control, though those are among the gravest pathways. If series like these are published, they belong on the board.</p>
+
+<h2 id="method">7. Method</h2>
+<p style="font-family:var(--sans);font-size:14px">
+<b>Frontier.</b> For each indicator the "latest best" is the highest value measured so far. Compute and cost are fitted on models that were among the ten largest when published, which is Epoch AI's frontier definition [16]. Benchmarks are fitted on the models that set a new record.
+<b>Pace.</b> Growing quantities are fitted as straight lines in log<sub>2</sub> against time; the slope gives a doubling time. Bounded scores are fitted as straight lines and given in points per year. The recent window ends at the latest measurement; the prior window is the same length just before it. A window needs at least three points.
+<b>Verdict.</b> Accelerating if the recent pace is at least {{ ((trend_cfg.faster - 1) * 100)|round|int }}% faster than the prior one, slowing if at least {{ ((1 - trend_cfg.slower) * 100)|round|int }}% slower, steady between.
+<b>Pace over time.</b> The data page shows how each pace would have been measured at every quarter, using only data published by then.
+<b>Refresh.</b> A scheduled Facetwork workflow re-fetches every source (a source that has not changed is not re-downloaded), rebuilds every page and publishes the result. Pages depend only on the data, so an unchanged week publishes nothing.
+</p>
+
+<h2 id="refs">8. References</h2>
+<ol class="refs">
+<li>Bostrom, N. (2014). <i>Superintelligence: Paths, Dangers, Strategies</i>. Oxford University Press.</li>
+<li>Russell, S. (2019). <i>Human Compatible: Artificial Intelligence and the Problem of Control</i>. Viking.</li>
+<li>Hendrycks, D., Mazeika, M. &amp; Woodside, T. (2023). An Overview of Catastrophic AI Risks. <a href="https://arxiv.org/abs/2306.12001">arXiv:2306.12001</a>.</li>
+<li>Bengio, Y. et al. (2025). International AI Safety Report. <a href="https://arxiv.org/abs/2501.17805">arXiv:2501.17805</a>.</li>
+<li>Slattery, P. et al. (2024). The AI Risk Repository. <a href="https://arxiv.org/abs/2408.12622">arXiv:2408.12622</a>; <a href="https://airisk.mit.edu/">airisk.mit.edu</a>.</li>
+<li>Center for AI Safety (2023). <a href="https://www.safe.ai/work/statement-on-ai-risk">Statement on AI Risk</a>.</li>
+<li>{% for rd in surveys.rounds %}{{ rd.citation }} <a href="{{ rd.url }}">link</a>{% if not loop.last %}; {% endif %}{% endfor %}</li>
+<li>Kulveit, J. et al. (2025). Gradual Disempowerment: Systemic Existential Risks from Incremental AI Development. <a href="https://arxiv.org/abs/2501.16946">arXiv:2501.16946</a>.</li>
+<li>Greenblatt, R. et al. (2024). Alignment Faking in Large Language Models. <a href="https://arxiv.org/abs/2412.14093">arXiv:2412.14093</a>.</li>
+<li>Meinke, A. et al. (2024). Frontier Models are Capable of In-context Scheming. <a href="https://arxiv.org/abs/2412.04984">arXiv:2412.04984</a>.</li>
+<li>Kwa, T. et al. (2025). Measuring AI Ability to Complete Long Tasks. METR. <a href="https://arxiv.org/abs/2503.14499">arXiv:2503.14499</a>.</li>
+<li>Zhang, A. K. et al. (2024). Cybench: A Framework for Evaluating Cybersecurity Capabilities and Risks of Language Models. <a href="https://arxiv.org/abs/2408.08926">arXiv:2408.08926</a>.</li>
+<li>Rein, D. et al. (2023). GPQA: A Graduate-Level Google-Proof Q&amp;A Benchmark. <a href="https://arxiv.org/abs/2311.12022">arXiv:2311.12022</a>.</li>
+<li>Center for AI Safety &amp; Scale AI (2025). Remote Labor Index. <a href="https://www.remotelabor.ai/">remotelabor.ai</a>.</li>
+<li>Narayanan, A. &amp; Kapoor, S. (2025). <a href="https://knightcolumbia.org/content/ai-as-normal-technology">AI as Normal Technology</a>. Knight First Amendment Institute.</li>
+<li>Sevilla, J. et al. (2022). Compute Trends Across Three Eras of Machine Learning. <a href="https://arxiv.org/abs/2202.05924">arXiv:2202.05924</a>; data: <a href="https://epoch.ai/data">Epoch AI</a>.</li>
+<li>Carlsmith, J. (2022). Is Power-Seeking AI an Existential Risk? <a href="https://arxiv.org/abs/2206.13353">arXiv:2206.13353</a>.</li>
+<li>Bulletin of the Atomic Scientists. <a href="https://thebulletin.org/doomsday-clock/">Doomsday Clock statements</a>, 1947–{{ clock.year }}.</li>
+<li>McGregor, S. (2021). Preventing Repeated Real World AI Failures by Cataloging Incidents: The AI Incident Database. <a href="https://arxiv.org/abs/2011.08512">arXiv:2011.08512</a>; <a href="https://incidentdatabase.ai/">incidentdatabase.ai</a>.</li>
+<li>Anthropic (2025). <a href="https://www.anthropic.com/news/activating-asl3-protections">Activating AI Safety Level 3 Protections</a>.</li>
+<li>Urbina, F., Lentzos, F., Invernizzi, C. &amp; Ekins, S. (2022). Dual use of artificial-intelligence-powered drug discovery. <i>Nature Machine Intelligence</i> 4, 189–191.</li>
+</ol>
+</article>
+{% endblock %}

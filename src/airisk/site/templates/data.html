@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% import "macros.html" as m %}
+{% block title %}The data — AI Risk Clock{% endblock %}
+{% block content %}
+<h1 class="page">The data</h1>
+<p class="lede">Every indicator in full: every model measured, the best so far, the pace fitted over the last window and the one before, and how that pace has itself changed over the years. Hover a point for the model and value.</p>
+
+<p class="t">{% for v in board %}<a href="#{{ v.key }}">{{ v.title }}</a> · {% endfor %}<a href="#incidents">Incidents</a> · <a href="#clock">Doomsday Clock</a> · <a href="#surveys">Expert surveys</a> · <a href="#history">Refresh history</a></p>
+
+{% for v in board %}
+<section class="panel section" id="{{ v.key }}">
+  <div class="panel-head ind-head"><h2>{{ v.title }}</h2>{{ m.verdict(v.verdict) }}<span class="t">{{ v.pathway_name }}</span></div>
+  <div class="pad" style="padding-bottom:.3rem">{{ v.question }} <span class="t">{{ v.note }}</span></div>
+  {{ v.chart }}
+  {{ m.legend_series(v) }}
+  <div class="kv">
+    <div><div class="k">Latest best</div>{{ v.latest_value }}<div class="t">{{ v.latest_label }}, {{ v.latest_date }}</div></div>
+    <div><div class="k">Pace, last {{ v.years|int }} yr{{ 's' if v.years != 1 }}</div>{{ v.recent }}<div class="t">fitted on {{ v.recent_n }} models</div></div>
+    <div><div class="k">Pace, window before</div>{{ v.prior }}</div>
+    <div><div class="k">Source</div><a href="{{ v.source_url }}">{{ v.source }}</a><div class="t">{{ v.n_points }} measurements; pace fitted on {{ v.n_fit }}</div></div>
+  </div>
+  {% if v.pace_chart %}
+  <div class="pad t" style="border-top:1px solid var(--border)">How the pace itself has changed: the {{ 'doubling time' if v.log else 'yearly gain' }} as it would have been measured at each quarter, from the data available then.{% if v.log %} Lower = faster.{% endif %}</div>
+  {{ v.pace_chart }}
+  {% endif %}
+  {{ m.milestones(v) }}
+</section>
+{% endfor %}
+
+<section class="panel section" id="incidents">
+  <div class="panel-head"><h2>Reported AI incidents</h2><span class="t">AI Incident Database snapshot {{ incidents.snapshot }}, incidents dated through {{ incidents.through }}</span></div>
+  {{ incidents.chart }}
+  <div class="legend">{% for cls, c in incidents.cats %}<span><i class="sq" style="background:var(--{{ cls }})"></i>{{ c }}</span>{% endfor %}<span><i class="sq" style="background:var(--s0)"></i>not yet classified</span></div>
+  <div class="grid2 pad">
+    <div>
+      <table class="dtable"><thead><tr><th>Year</th><th class="num">Incidents</th></tr></thead><tbody>
+      {% for y, n in incidents.totals|dictsort|reverse %}<tr><td>{{ y }}{% if y == incidents.partial %} <span class="t">(to {{ incidents.through }})</span>{% endif %}</td><td class="num">{{ "{:,}".format(n) }}</td></tr>{% endfor %}
+      </tbody></table>
+    </div>
+    <div>
+      <table class="dtable"><thead><tr><th>{{ incidents.last_full }} by MIT risk domain</th><th class="num">Incidents</th><th class="num">Share</th></tr></thead><tbody>
+      {% for d in incidents.domain_share %}<tr><td>{{ d.domain }}</td><td class="num">{{ d.count }}</td><td class="num">{{ m.pct(d.share) }}</td></tr>{% endfor %}
+      </tbody></table>
+      <p class="t">Share of incidents with an MIT classification. {{ "{:,}".format(incidents.all_time) }} incidents in the database in all.</p>
+    </div>
+  </div>
+  <div class="note" style="margin:0 1rem 1rem">An incident is a harm or near-harm someone reported and the database's editors accepted, dated when it happened. Counts rise with media attention and with the database's own reach, and recent months fill in as reports arrive, so the year in progress always looks low. Read the mix of domains, and the long-run rise, rather than any one year's change.</div>
+</section>
+
+<section class="panel section" id="clock">
+  <div class="panel-head"><h2>The Doomsday Clock</h2><span class="t">Minutes to midnight at each setting, Bulletin of the Atomic Scientists (via Wikipedia)</span></div>
+  {{ clock.chart }}
+  <div class="pad t">The line steps at each setting and holds until the next. The marker shows the first setting whose stated reasons (as summarised on Wikipedia) cite disruptive or advancing technologies such as AI: {{ clock.ai_years|join(', ') }}. The clock is a judgement by the Bulletin's Science and Security Board, mostly about nuclear weapons and climate change; it is not computed from data.</div>
+  <div class="overflow-x"><table class="dtable"><thead><tr><th>Year</th><th>Setting</th><th>Reason given</th></tr></thead><tbody>
+  {% for s in clock.settings %}<tr><td>{{ s.year }}</td><td class="num">{{ s.text }}</td><td style="font-size:12.5px">{{ s.reason|truncate(320) }}{% if s.ai %} <span class="v v-steady">technology</span>{% endif %}</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+
+<section class="panel section" id="surveys">
+  <div class="panel-head"><h2>What AI researchers say</h2><span class="t">Expert Survey on Progress in AI (AI Impacts)</span></div>
+  <div class="grid2 pad">
+    <div><b style="font-size:13px">Chance the long-run outcome is "extremely bad (e.g. human extinction)"</b>{{ surveys.p_chart }}
+      <div class="legend" style="padding-left:0"><span><i style="background:var(--s1)"></i>median respondent</span><span><i style="background:var(--s2)"></i>mean</span></div></div>
+    <div><b style="font-size:13px">Year by which they give even odds of human-level AI</b>{{ surveys.h_chart }}</div>
+  </div>
+  <div class="overflow-x"><table class="dtable"><thead><tr><th>Round</th><th class="num">Respondents</th><th class="num">Median</th><th class="num">Mean</th><th class="num">50% HLMI by</th><th>Notes</th></tr></thead><tbody>
+  {% for r in surveys.rounds|reverse %}<tr><td><a href="{{ r.url }}">{{ r.year }}</a></td><td class="num">{{ "{:,}".format(r.respondents) }}</td><td class="num">{{ m.pct(r.extremely_bad_median) }}</td><td class="num">{{ m.pct(r.extremely_bad_mean) if r.extremely_bad_mean is not none else '—' }}</td><td class="num">{{ r.hlmi_50_year }}</td><td style="font-size:12.5px">{{ r.wording }} <span class="t">{{ r.citation }}</span></td></tr>{% endfor %}
+  </tbody></table></div>
+  <div class="pad t">{{ surveys.about }}</div>
+</section>
+
+<section class="panel section" id="history">
+  <div class="panel-head"><h2>Refresh history</h2><span class="t">The reading recorded whenever the data changed ({{ history_n }} so far)</span></div>
+  <div class="overflow-x"><table class="dtable"><thead><tr><th>Data through</th>{% for v in board %}<th>{{ v.key }}</th>{% endfor %}</tr></thead><tbody>
+  {% for h in history %}<tr><td>{{ h.through }}</td>{% for v in board %}{% set r = h.indicators.get(v.key) %}<td class="t">{% if r %}<b>{{ r.latest_text }}</b><br>{{ r.pace }}<br>{{ r.verdict }}{% endif %}</td>{% endfor %}</tr>{% endfor %}
+  </tbody></table></div>
+  <div class="pad t">Each refresh appends a row only when a reading changed, so this table is the clock's own history: how the measured pace of each driver has moved between refreshes.</div>
+</section>
+{% endblock %}
