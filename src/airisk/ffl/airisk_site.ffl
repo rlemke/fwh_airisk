@@ -15,6 +15,35 @@
 namespace airisk.publish {
     use census.Publish
 
+    /** The weekly job: search for new outages and hacks blamed on AI, then
+      * rebuild and publish. The search writes its overlay to the domain store
+      * and the build reads it from there, so no value flows between them:
+      * the order is an invisible dependency, stated with `after`. */
+    workflow RefreshEvents(repo: String = "rlemke/facetwork-maps", dest: String = "ai-risk") => (
+        added: Int,
+        updated: Int,
+        rejected: Int,
+        pages_url: String,
+        commit: String
+    ) andThen {
+        found = airisk.events.Refresh()
+        up = airisk.workflows.Update() after found
+        published = PublishWebBundle(
+            repo = $.repo,
+            prefixes = [up.output_dir],
+            dests = [$.dest],
+            include = [".html"],
+            labels = ["AI Risk Clock"]
+        )
+        yield RefreshEvents(
+            added = found.added,
+            updated = found.updated,
+            rejected = found.rejected,
+            pages_url = published.pages_url,
+            commit = published.commit
+        )
+    }
+
     /** The scheduled job: refresh every source, rebuild, publish. */
     workflow UpdateSite(repo: String = "rlemke/facetwork-maps", dest: String = "ai-risk") => (
         pages_url: String,

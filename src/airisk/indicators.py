@@ -440,14 +440,43 @@ def surveys() -> dict:
 EVENT_LINKS = ("ai-acted", "ai-used", "ai-tool", "patch-rush", "speculated", "none")
 
 
-def events() -> dict:
-    """Outages and hacks someone has blamed on AI (``data/events.json``).
+def events_base() -> dict:
+    """The hand-curated list as written (``data/events.json``), unvalidated."""
+    return json.loads((Path(__file__).parent / "data" / "events.json").read_text(encoding="utf-8"))
 
-    Hand-curated, like the surveys: every entry carries its sources, the
-    cause the organisation states, and a grade of the evidence for an AI
-    link. Validated here so a bad edit fails the build instead of rendering.
+
+def apply_auto(base: dict, auto: dict | None) -> dict:
+    """The curated list with the weekly search's additions and updates on top.
+
+    A hand edit is never overwritten: an update whose event is no longer in
+    the curated file is ignored, and an addition that has since been curated
+    (same date and organisation) gives way to the curated row.
     """
-    d = json.loads((Path(__file__).parent / "data" / "events.json").read_text(encoding="utf-8"))
+    d = json.loads(json.dumps(base))
+    if not auto:
+        return d
+    by_key = {f"{e['date']}|{e['org']}": e for e in d["events"]}
+    for k, u in (auto.get("updates") or {}).items():
+        e = by_key.get(k)
+        if e is None:
+            continue
+        for f in ("what", "stated", "ai", "link"):
+            if u.get(f):
+                e[f] = u[f]
+        have = {s["url"] for s in e["sources"]}
+        e["sources"] = e["sources"] + [s for s in u.get("sources", []) if s["url"] not in have]
+        e["auto_update"] = {"on": u["on"], "reason": u["reason"]}
+    for a in auto.get("additions") or []:
+        if f"{a['date']}|{a['org']}" not in by_key:
+            d["events"].append(json.loads(json.dumps(a)))
+    runs = auto.get("runs") or []
+    if runs:
+        d["searched"] = runs[-1]["date"]
+        d["as_of"] = max(d["as_of"], runs[-1]["date"])
+    return d
+
+
+def validate_events(d: dict) -> dict:
     if set(d["links"]) != set(EVENT_LINKS):
         raise ValueError(f"events.json links must be exactly {EVENT_LINKS}")
     for e in d["events"]:
@@ -463,3 +492,14 @@ def events() -> dict:
             raise ValueError(f"event {name!r}: every event needs https sources")
     d["events"].sort(key=lambda e: e["date"], reverse=True)
     return d
+
+
+def events(auto: dict | None = None) -> dict:
+    """Outages and hacks someone has blamed on AI (``data/events.json``).
+
+    Hand-curated, like the surveys: every entry carries its sources, the
+    cause the organisation states, and a grade of the evidence for an AI
+    link. ``auto`` is the weekly search's overlay (see ``events_refresh``).
+    Validated here so a bad edit fails the build instead of rendering.
+    """
+    return validate_events(apply_auto(events_base(), auto))

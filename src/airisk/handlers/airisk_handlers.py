@@ -48,7 +48,7 @@ def handle_site_build(params: dict[str, Any]) -> dict[str, Any]:
     from facetwork.domains.storage import is_remote, join
 
     from ..site import build_site
-    from ..storage import S, history_path
+    from ..storage import S, events_auto_path, history_path
 
     srcs = _json(params.get("sources"), [])
     paths = _json(params.get("paths"), [])
@@ -66,11 +66,15 @@ def handle_site_build(params: dict[str, Any]) -> dict[str, Any]:
         raise ValueError(f"missing sources: {sorted(missing)}")
     hp = history_path()
     history = json.loads(S.read_text(hp)) if S.exists(hp) else []
+    ap = events_auto_path()
+    events_auto = json.loads(S.read_text(ap)) if S.exists(ap) else None
     dest = join(S.maps_root(), "site", "airisk")
     log = params.get("_step_log")
     with tempfile.TemporaryDirectory(prefix="airisk_") as tmp:
         stamps = {s["key"]: s["stamp"] for s in srcs if s.get("stamp")}
-        out = build_site(local, tmp, history=history, log=log, stamps=stamps)
+        out = build_site(
+            local, tmp, history=history, log=log, stamps=stamps, events_auto=events_auto
+        )
         for rel in out["paths"]:
             target = join(dest, rel)
             if not is_remote(target):
@@ -94,10 +98,23 @@ def handle_site_build(params: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def handle_events_refresh(params: dict[str, Any]) -> dict[str, Any]:
+    """The weekly search for outages and hacks blamed on AI (see events_refresh)."""
+    from ..events_refresh import refresh
+
+    out = refresh(log=params.get("_step_log"))
+    return {k: out[k] for k in ("added", "updated", "rejected", "as_of", "log_path")}
+
+
 _DISPATCH: dict[str, Callable[[dict], dict]] = {
     "airisk.data.Sources": handle_sources,
     "airisk.site.Build": handle_site_build,
+    "airisk.events.Refresh": handle_events_refresh,
 }
+
+#: The weekly search calls the Claude API. Declared on the registration so a
+#: runner without the key does not advertise the facet and never claims it.
+REQUIRES_ENV = {"airisk.events.Refresh": ["ANTHROPIC_API_KEY"]}
 
 
 def handle(payload: dict) -> dict:
@@ -115,6 +132,11 @@ def register_handlers(runner) -> None:
             facet_name=facet_name,
             module_uri=f"file://{os.path.abspath(__file__)}",
             entrypoint="handle",
+            **(
+                {"metadata": {"requires_env": REQUIRES_ENV[facet_name]}}
+                if facet_name in REQUIRES_ENV
+                else {}
+            ),
         )
 
 

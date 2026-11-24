@@ -58,7 +58,7 @@
 </section>
 
 <section class="panel section" id="blamed">
-  <div class="panel-head"><h2>Outages and hacks blamed on AI</h2><span class="t">Hand-curated from news reports, as of {{ events.as_of }}. Each row keeps apart what happened, the cause the organisation states, and who links it to AI.</span></div>
+  <div class="panel-head"><h2>Outages and hacks blamed on AI</h2><span class="t">Curated from news reports{% if events.searched %} and searched again each week (last {{ events.searched }}){% else %}, as of {{ events.as_of }}{% endif %}. Each row keeps apart what happened, the cause the organisation states, and who links it to AI.</span></div>
   <div class="pad" style="font-size:14px">
     {% set w = events.wave %}
     <p style="margin:0 0 .6rem">Between 12 and 17 November 2026, {{ w|length }} large outages hit in a row: {% for e in w|reverse %}{{ e.org }}{% if not loop.last %}, {% endif %}{% endfor %}. <b>None has an official AI cause.</b> Each organisation blames its own bug, update, maintenance or router, and officials say none was a cyberattack and that they are not connected. The AI explanations range from speculation, such as the Homeland Security Secretary passing on a theory that "it's the SI" (superintelligence), to an anonymously sourced claim that rushed patches for flaws found by AI overloaded systems. The Director of National Intelligence tied the NSA outage to patching for a PHP vulnerability. AI-assisted research had found PHP flaws that autumn.</p>
@@ -75,7 +75,9 @@
         <td style="min-width:220px"><b>{{ e.org }}</b>: {{ e.title }}<div class="t">{{ e.what }}</div></td>
         <td class="t" style="min-width:200px;color:var(--text-2)">{{ e.stated }}</td>
         <td style="min-width:240px"><span class="v v-{{ e.badge }}" title="{{ e.meaning }}">{{ e.label }}</span><div class="t" style="margin-top:.3rem;color:var(--text-2)">{{ e.ai }}</div>
-          <div class="t" style="margin-top:.3rem">{% for s in e.sources %}<a href="{{ s.url }}">{{ s.outlet }}</a>{% if not loop.last %} · {% endif %}{% endfor %}</div></td>
+          <div class="t" style="margin-top:.3rem">{% for s in e.sources %}<a href="{{ s.url }}">{{ s.outlet }}</a>{% if not loop.last %} · {% endif %}{% endfor %}</div>
+          {%- if e.auto_added %}<div class="t" style="margin-top:.3rem;font-style:italic">Found by the weekly automated search on {{ e.auto_added }}; not yet checked by hand.</div>{% endif %}
+          {%- if e.auto_update %}<div class="t" style="margin-top:.3rem;font-style:italic">Updated by the weekly automated search on {{ e.auto_update.on }}: {{ e.auto_update.reason }}</div>{% endif %}</td>
       </tr>
     {% endfor %}
     </tbody>
@@ -85,7 +87,7 @@
     <b>Context.</b>
     {% for c in events.context %}{{ c.text }} <a href="{{ c.url }}">source</a>{% if not loop.last %}<br>{% endif %}{% endfor %}
   </div>
-  <div class="pad t" style="padding-top:0">Causes still under investigation can change. The FAA's root-cause search and Microsoft's final report were not public when this was written. A row moves up or down the scale when the evidence does. The AI Incident Database count below is separate and includes these events only once they are reported there.</div>
+  <div class="pad t" style="padding-top:0">Causes still under investigation can change. The FAA's root-cause search and Microsoft's final report were not public when this was written. A row moves up or down the scale when the evidence does. Each week an AI model (Claude, with web search) looks for new cases and for new facts on these. A change it proposes is published only if every source it cites came up in its own search, and the rows it added or changed are marked until checked by hand. The AI Incident Database count below is separate and includes these events only once they are reported there.</div>
 </section>
 
 <div class="grid2 section">

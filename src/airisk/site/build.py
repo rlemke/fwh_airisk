@@ -55,7 +55,11 @@ PACE_STEP = 0.25  # quarterly as-of readings for the pace-over-time charts
 DURATION_TICKS = [1 / 60, 10 / 60, 1, 10, 60, 480, 2400, 10020, 120000, 1200000]
 
 
-def load_all(paths: dict[str, str], stamps: dict[str, str] | None = None) -> dict:
+def load_all(
+    paths: dict[str, str],
+    stamps: dict[str, str] | None = None,
+    events_auto: dict | None = None,
+) -> dict:
     """Parse every fetched file. ``paths`` maps a source key to a LOCAL path;
     ``stamps`` carries a source's date when its file name does not."""
     compute, cost = indicators.epoch_models(paths["epoch_models"])
@@ -69,7 +73,7 @@ def load_all(paths: dict[str, str], stamps: dict[str, str] | None = None) -> dic
         ),
         "clock": indicators.doomsday_clock(paths["doomsday_clock"]),
         "surveys": indicators.surveys(),
-        "events": indicators.events(),
+        "events": indicators.events(events_auto),
     }
 
 
@@ -423,6 +427,7 @@ def _events_view(d: dict) -> dict:
         "wave": nov,
         "context": d["context"],
         "as_of": d["as_of"],
+        "searched": d.get("searched"),
         "about": d["_about"],
     }
 
@@ -459,8 +464,9 @@ def build_site(
     history: list[dict] | None = None,
     log=None,
     stamps: dict[str, str] | None = None,
+    events_auto: dict | None = None,
 ) -> dict:
-    data = load_all(paths, stamps)
+    data = load_all(paths, stamps, events_auto)
     inds: dict[str, Indicator] = data["indicators"]
     latest_dates = [i.latest[0] for i in inds.values() if i.latest]
     through = max(latest_dates)
