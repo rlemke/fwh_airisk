@@ -74,6 +74,7 @@ def load_all(
         "clock": indicators.doomsday_clock(paths["doomsday_clock"]),
         "surveys": indicators.surveys(),
         "events": indicators.events(events_auto),
+        "claims": indicators.claims(events_auto),
     }
 
 
@@ -432,6 +433,79 @@ def _events_view(d: dict) -> dict:
     }
 
 
+CLAIM_BADGE = {"confirmed": "accelerating", "partly": "steady", "non-ai": "slowing", "open": "too"}
+
+
+def _days(a: str | None, b: str | None) -> int | None:
+    """Days between two YYYY-MM-DD dates; None if either is missing or partial."""
+    from datetime import date
+
+    if not a or not b or len(a) != 10 or len(b) != 10:
+        return None
+    return (date.fromisoformat(b) - date.fromisoformat(a)).days
+
+
+def _claims_view(d: dict) -> dict:
+    outs = indicators.CLAIM_OUTCOMES
+    kinds = indicators.CLAIMANT_KINDS
+    rows = []
+    for c in sorted(d["claims"], key=lambda c: c["incident"], reverse=True):
+        label, meaning = d["rubric"]["outcomes"][c["outcome"]]
+        o = c.get("official")
+        rows.append(
+            {
+                **c,
+                "label": label,
+                "meaning": meaning,
+                "badge": CLAIM_BADGE[c["outcome"]],
+                "days": _days(c["claim"]["date"], o["date"] if o else None),
+            }
+        )
+    counts = {k: sum(1 for c in rows if c["outcome"] == k) for k in outs}
+    table = [
+        {
+            "kind": k,
+            "about": d["rubric"]["claimants"][k],
+            "n": sum(1 for c in rows if c["claim"]["kind"] == k),
+            **{
+                o: sum(1 for c in rows if c["claim"]["kind"] == k and c["outcome"] == o)
+                for o in outs
+            },
+        }
+        for k in kinds
+    ]
+    for t in table:
+        t["resolved"] = t["n"] - t["open"]
+    dated = [c["days"] for c in rows if c["days"] is not None]
+    days = sorted(abs(x) for x in dated)
+    n_before = sum(1 for x in dated if x < 0)
+    unbacked = [t for t in table if t["kind"] in ("official", "commentator")]
+    backed = next(t for t in table if t["kind"] == "evidence")
+    return {
+        "claims": rows,
+        "disclosed": sorted(d["disclosed"], key=lambda x: x["date"], reverse=True),
+        "outcomes": [(k, *d["rubric"]["outcomes"][k], CLAIM_BADGE[k], counts[k]) for k in outs],
+        "counts": counts,
+        "n": len(rows),
+        "by_kind": table,
+        "unbacked_resolved": sum(t["resolved"] for t in unbacked),
+        "unbacked_held": sum(t["confirmed"] + t["partly"] for t in unbacked),
+        "backed_resolved": backed["resolved"],
+        "backed_held": backed["confirmed"] + backed["partly"],
+        "median_days": days[len(days) // 2] if days else None,
+        "n_days": len(days),
+        "n_before": n_before,
+        "n_cause_first": sum(
+            1
+            for c in rows
+            if c.get("cause_before_claim") and c["claim"]["kind"] in ("official", "commentator")
+        ),
+        "rubric_notes": d["rubric"]["notes"],
+        "as_of": d["as_of"],
+        "about": d["_about"],
+    }
+
+
 def summarize(views: dict[str, dict], through: str) -> dict:
     """The compact reading recorded at each refresh."""
     return {
@@ -485,6 +559,7 @@ def build_site(
         "incidents": _incident_view(data["incidents"]),
         "surveys": _survey_view(data["surveys"]),
         "events": _events_view(data["events"]),
+        "claims": _claims_view(data["claims"]),
         "through": through_str,
         "through_label": trend.date_of(through).strftime("%-d %B %Y"),
         "accelerating": accel,

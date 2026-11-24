@@ -62,8 +62,12 @@ namespace airisk.events {
       * newly blamed on AI and for new facts on the listed ones. Every proposal
       * is checked (fields, grade, sources that came up in its own searches)
       * and what passes goes to an overlay in the domain store, which the site
-      * build applies on top of the hand-curated list and marks on the page. */
-    event facet Refresh() => (added: Int, updated: Int, rejected: Int, as_of: String, log_path: String)
+      * build applies on top of the hand-curated list and marks on the page.
+      * It also looks for official accounts of the tracked claims still open
+      * (data/claims.json), so "did the AI blame hold up?" firms up over time. */
+    event facet Refresh() => (
+        added: Int, updated: Int, resolved: Int, rejected: Int, as_of: String, log_path: String
+    )
         with Effect(kind = "external") with Cost(tier = "expensive") with Timeout(minutes = 45)
 }
 

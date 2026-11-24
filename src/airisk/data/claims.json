@@ -1,0 +1,821 @@
+{
+ "_about": "Did early claims that AI caused or enabled an outage, breach or hack hold up? Each row is one public claim and what the official account later said. Hand-curated 2026-11-24 from a sourced search (five research passes, outcomes coded by one rubric, below), and checked again each week for the open ones.",
+ "as_of": "2026-11-24",
+ "rubric": {
+  "outcomes": {
+   "confirmed": [
+    "Held up",
+    "The responsible party or official investigators later said AI played the role claimed."
+   ],
+   "partly": [
+    "Partly",
+    "AI was involved, but not in the way claimed, or the official account confirms part of the claim and disputes the rest."
+   ],
+   "non-ai": [
+    "Did not hold up",
+    "An official cause was given that excludes AI, or the AI role was explicitly denied."
+   ],
+   "open": [
+    "No answer yet",
+    "No official cause yet, or the official account does not address the AI claim."
+   ]
+  },
+  "claimants": {
+   "official": "a politician or government official, speaking without published evidence",
+   "commentator": "a commentator or social-media posts",
+   "press-anonymous": "a news report resting on anonymous sources",
+   "evidence": "someone showing direct evidence: logs, screenshots, code, a malware sample, or a test anyone could repeat"
+  },
+  "notes": [
+   "The official account is usually the organisation's own. A denial by the organisation that would be blamed is weaker than an independent finding, and the 'by' field says which it was.",
+   "Cases where the responsible party or investigators disclosed the AI role themselves, from the start, are listed separately: there was no outside claim to test."
+  ]
+ },
+ "claims": [
+  {
+   "id": "crowdstrike-2024",
+   "incident": "2024-07-19",
+   "org": "CrowdStrike",
+   "sector": "Security software",
+   "what": "A faulty sensor update crashed about 8.5 million Windows machines worldwide.",
+   "claim": {
+    "date": null,
+    "by": "A Substack and LinkedIn commentator",
+    "kind": "commentator",
+    "text": "Wrote that \"AI caused the worldwide CrowdStrike outage\".",
+    "source": {
+     "outlet": "Josh Bernoff (blog)",
+     "title": "Did AI cause the CrowdStrike crash?",
+     "url": "https://bernoff.com/blog/did-ai-cause-the-crowdstrike-crash"
+    }
+   },
+   "official": {
+    "date": "2024-08-06",
+    "by": "CrowdStrike root cause analysis",
+    "independent": false,
+    "finding": "A content update (Channel File 291) supplied 21 input fields where the sensor expected 20, causing an out-of-bounds read. No AI role.",
+    "source": {
+     "outlet": "CrowdStrike",
+     "title": "Channel File 291 Incident: Root Cause Analysis is Available",
+     "url": "https://www.crowdstrike.com/en-us/blog/channel-file-291-rca-available/"
+    }
+   },
+   "outcome": "non-ai",
+   "note": "A fringe claim, made after CrowdStrike had named the update as the cause.",
+   "cause_before_claim": true
+  },
+  {
+   "id": "aws-useast1-2025",
+   "incident": "2025-10-20",
+   "org": "Amazon Web Services",
+   "sector": "Cloud",
+   "what": "About 15 hours of disruption in US-EAST-1 took down thousands of dependent apps.",
+   "claim": {
+    "date": "2025-10-20",
+    "by": "Elon Musk, on X",
+    "kind": "commentator",
+    "text": "Reposted a claim that about 75% of Amazon's code is AI-generated, adding \"You don't say\".",
+    "source": {
+     "outlet": "The Indian Witness",
+     "title": "Massive AWS Outage Hits Half the Internet as Musk Mocks AI Code Dependence",
+     "url": "https://www.indianwitness.com/news/international/massive-aws-outage-hits-half-the-internet-as-musk-mocks"
+    }
+   },
+   "official": {
+    "date": null,
+    "by": "AWS post-event summary",
+    "independent": false,
+    "finding": "A latent race condition in DynamoDB's DNS management left an empty DNS record. No AI role.",
+    "source": {
+     "outlet": "AWS",
+     "title": "Summary of the Amazon DynamoDB Service Disruption in the Northern Virginia (US-EAST-1) Region",
+     "url": "https://aws.amazon.com/message/101925/"
+    }
+   },
+   "outcome": "non-ai",
+   "note": "An insinuation rather than an explicit causal claim; the 75% figure is itself unverified.",
+   "cause_before_claim": false
+  },
+  {
+   "id": "replit-2025",
+   "incident": "2025-07-18",
+   "org": "SaaStr, on Replit",
+   "sector": "Software",
+   "what": "Replit's AI coding agent deleted a company's production database during a code freeze.",
+   "claim": {
+    "date": "2025-07-18",
+    "by": "SaaStr's founder, with screenshots",
+    "kind": "evidence",
+    "text": "\"It deleted our production database without permission.\"",
+    "source": {
+     "outlet": "eWeek",
+     "title": "'Catastrophic Failure': AI Agent Wipes Production Database, Then Lies About It",
+     "url": "https://www.eweek.com/news/replit-ai-coding-assistant-failure/"
+    }
+   },
+   "official": {
+    "date": "2025-07-22",
+    "by": "Replit's CEO",
+    "independent": false,
+    "finding": "Called the deletion \"unacceptable and should never be possible\" and announced safeguards, accepting that the agent did it.",
+    "source": {
+     "outlet": "eWeek",
+     "title": "'Catastrophic Failure': AI Agent Wipes Production Database, Then Lies About It",
+     "url": "https://www.eweek.com/news/replit-ai-coding-assistant-failure/"
+    }
+   },
+   "outcome": "confirmed",
+   "cause_before_claim": false
+  },
+  {
+   "id": "cursor-2025",
+   "incident": "2025-04-14",
+   "org": "Anysphere (Cursor)",
+   "sector": "Software",
+   "what": "Cursor's AI support agent told users about a log-in policy that did not exist; users cancelled.",
+   "claim": {
+    "date": "2025-04-18",
+    "by": "Users on Reddit and Hacker News, quoting the reply",
+    "kind": "evidence",
+    "text": "The support reply came from an AI bot that invented the policy.",
+    "source": {
+     "outlet": "The Register",
+     "title": "Cursor AI support bot lies",
+     "url": "https://www.theregister.com/2025/04/18/cursor_ai_support_bot_lies/"
+    }
+   },
+   "official": {
+    "date": "2025-04-18",
+    "by": "Cursor's co-founder",
+    "independent": false,
+    "finding": "\"We have no such policy\"; it was \"an incorrect response from a front-line AI support bot\".",
+    "source": {
+     "outlet": "Slashdot",
+     "title": "Cursor AI's Own Support Bot Hallucinated Its Usage Policy",
+     "url": "https://tech.slashdot.org/story/25/04/21/2031245/cursor-ais-own-support-bot-hallucinated-its-usage-policy"
+    }
+   },
+   "outcome": "confirmed",
+   "cause_before_claim": false
+  },
+  {
+   "id": "amazon-q-2025",
+   "incident": "2025-07-17",
+   "org": "Amazon Web Services (Amazon Q extension)",
+   "sector": "Software supply chain",
+   "what": "A release of Amazon's AI coding extension shipped with a planted prompt telling the agent to wipe files and cloud resources.",
+   "claim": {
+    "date": "2025-07-23",
+    "by": "404 Media, from the hacker's account and the code",
+    "kind": "evidence",
+    "text": "A hacker planted wiping commands in Amazon's AI coding agent.",
+    "source": {
+     "outlet": "404 Media",
+     "title": "Hacker Plants Computer 'Wiping' Commands in Amazon's AI Coding Agent",
+     "url": "https://www.404media.co/hacker-plants-computer-wiping-commands-in-amazons-ai-coding-agent/"
+    }
+   },
+   "official": {
+    "date": "2025-07-23",
+    "by": "AWS security bulletin",
+    "independent": false,
+    "finding": "A mis-scoped GitHub token let an attacker commit the code, which shipped in version 1.84.0; it failed to run because of a syntax error.",
+    "source": {
+     "outlet": "AWS",
+     "title": "Security Update for Amazon Q Developer Extension for Visual Studio Code (Version #1.84)",
+     "url": "https://aws.amazon.com/security/security-bulletins/AWS-2025-015/"
+    }
+   },
+   "outcome": "confirmed",
+   "note": "Confirmed as claimed: the AI agent was the target. The way in was a stolen token.",
+   "cause_before_claim": false
+  },
+  {
+   "id": "nx-2025",
+   "incident": "2025-08-26",
+   "org": "Nx (npm packages)",
+   "sector": "Software supply chain",
+   "what": "Malicious Nx packages harvested developers' secrets for about four hours.",
+   "claim": {
+    "date": "2025-08-27",
+    "by": "StepSecurity researchers, from the malware",
+    "kind": "evidence",
+    "text": "The malware turned the developers' own AI command-line tools into tools for finding secrets.",
+    "source": {
+     "outlet": "StepSecurity",
+     "title": "s1ngularity: Popular Nx Build System Package Compromised with Data-Stealing Malware",
+     "url": "https://www.stepsecurity.io/blog/supply-chain-security-alert-popular-nx-build-system-package-compromised-with-data-stealing-malware"
+    }
+   },
+   "official": {
+    "date": "2025-09-05",
+    "by": "Nx postmortem",
+    "independent": false,
+    "finding": "The payload \"attempted to use local AI tools (like Claude and Gemini)\" to search for secrets; the way in was a GitHub Actions flaw.",
+    "source": {
+     "outlet": "Nx",
+     "title": "S1ngularity - What Happened, How We Responded, What We Learned",
+     "url": "https://nx.dev/blog/s1ngularity-postmortem"
+    }
+   },
+   "outcome": "confirmed",
+   "cause_before_claim": false
+  },
+  {
+   "id": "cisa-chatgpt-2025",
+   "incident": "2025-07",
+   "org": "US Cybersecurity and Infrastructure Security Agency",
+   "sector": "Government",
+   "what": "The acting director reportedly uploaded documents marked for official use only to public ChatGPT.",
+   "claim": {
+    "date": "2026-01-27",
+    "by": "Politico, citing four DHS officials",
+    "kind": "press-anonymous",
+    "text": "The uploads set off automated security warnings.",
+    "source": {
+     "outlet": "CSO Online",
+     "title": "CISA chief uploaded sensitive government files to public ChatGPT",
+     "url": "https://www.csoonline.com/article/4124320/cisa-chief-uploaded-sensitive-government-files-to-public-chatgpt.html"
+    }
+   },
+   "official": {
+    "date": "2026-01-29",
+    "by": "CISA spokesperson",
+    "independent": false,
+    "finding": "Did not deny the uploads; said the use was approved under a temporary exception.",
+    "source": {
+     "outlet": "CSO Online",
+     "title": "CISA chief uploaded sensitive government files to public ChatGPT",
+     "url": "https://www.csoonline.com/article/4124320/cisa-chief-uploaded-sensitive-government-files-to-public-chatgpt.html"
+    }
+   },
+   "outcome": "confirmed",
+   "note": "A data-handling incident involving an AI tool, not an attack. No harm reported.",
+   "cause_before_claim": false
+  },
+  {
+   "id": "aws-kiro-2025",
+   "incident": "2025-12",
+   "org": "Amazon Web Services",
+   "sector": "Cloud",
+   "what": "AWS Cost Explorer was down about 13 hours in one region.",
+   "claim": {
+    "date": "2026-02-19",
+    "by": "Financial Times, citing four unnamed people",
+    "kind": "press-anonymous",
+    "text": "Amazon's Kiro AI agent decided to \"delete and recreate the environment\".",
+    "source": {
+     "outlet": "Engadget",
+     "title": "13-hour AWS outage reportedly caused by Amazon's own AI tools",
+     "url": "https://www.engadget.com/ai/13-hour-aws-outage-reportedly-caused-by-amazons-own-ai-tools-170930190.html"
+    }
+   },
+   "official": {
+    "date": "2026-02-20",
+    "by": "Amazon",
+    "independent": false,
+    "finding": "\"User error—specifically misconfigured access controls—not AI\"; the role was mis-scoped. Amazon does not deny Kiro was in use.",
+    "source": {
+     "outlet": "About Amazon",
+     "title": "Correcting the Financial Times report about AWS, Kiro, and AI",
+     "url": "https://www.aboutamazon.com/news/aws/aws-service-outage-ai-bot-kiro"
+    }
+   },
+   "outcome": "partly",
+   "note": "The dispute is whether the agent or the permissions it was given is the cause. Only Amazon's own account exists.",
+   "cause_before_claim": false
+  },
+  {
+   "id": "amazon-retail-2026",
+   "incident": "2026-03-05",
+   "org": "Amazon (retail site)",
+   "sector": "E-commerce",
+   "what": "Shoppers could not check out or see prices for about six hours, one of several severe incidents.",
+   "claim": {
+    "date": "2026-03-10",
+    "by": "Financial Times and CNBC, from an internal document",
+    "kind": "press-anonymous",
+    "text": "The document listed \"GenAI-assisted changes\" as a factor in a trend of incidents.",
+    "source": {
+     "outlet": "CNBC",
+     "title": "Amazon convenes 'deep dive' internal meeting to address outages",
+     "url": "https://www.cnbc.com/2026/03/10/amazon-plans-deep-dive-internal-meeting-address-ai-related-outages.html"
+    }
+   },
+   "official": {
+    "date": "2026-03-12",
+    "by": "Amazon spokesperson",
+    "independent": false,
+    "finding": "The 5 March outage was a code deployment; one incident involved an engineer following an AI agent's wrong advice; none involved AI-written code.",
+    "source": {
+     "outlet": "Fortune",
+     "title": "Amazon puts humans further back in the loop as its retail website crashes from 'inaccurate advice' that an AI agent took from an old wiki",
+     "url": "https://fortune.com/2026/03/12/amazon-retail-site-outages-ai-agent-inaccurate-advice"
+    }
+   },
+   "outcome": "partly",
+   "cause_before_claim": false
+  },
+  {
+   "id": "deloitte-2025",
+   "incident": "2025-07",
+   "org": "Deloitte Australia, for the Department of Employment and Workplace Relations",
+   "sector": "Government",
+   "what": "A paid government review cited works that do not exist and a court quote that was never said.",
+   "claim": {
+    "date": "2025-08",
+    "by": "A University of Sydney researcher, listing the false references",
+    "kind": "evidence",
+    "text": "The report was \"full of fabricated references\", likely hallucinated by AI.",
+    "source": {
+     "outlet": "Fortune (via Yahoo News)",
+     "title": "Deloitte was caught using AI in $290,000 report to help the Australian government crack down on welfare after a researcher flagged hallucinations",
+     "url": "https://www.yahoo.com/news/articles/deloitte-caught-using-ai-290-211057405.html"
+    }
+   },
+   "official": {
+    "date": "2025-10-06",
+    "by": "Deloitte's revised report and the department",
+    "independent": false,
+    "finding": "Disclosed that a generative AI model was used and refunded part of the fee; did not say the AI produced the false citations.",
+    "source": {
+     "outlet": "The Register",
+     "title": "Deloitte refunds Australian government over AI in report",
+     "url": "https://www.theregister.com/software/2025/10/06/deloitte-refunds-australian-government-over-ai-in-report/722000"
+    }
+   },
+   "outcome": "partly",
+   "cause_before_claim": false
+  },
+  {
+   "id": "mexico-2026",
+   "incident": "2025-12",
+   "org": "Mexican government bodies",
+   "sector": "Government",
+   "what": "A security firm said one attacker used Claude and ChatGPT to breach about ten agencies and take about 150 GB.",
+   "claim": {
+    "date": "2026-02-25",
+    "by": "Gambit Security, from the attacker's AI conversation logs",
+    "kind": "evidence",
+    "text": "\"AI didn't just assist, it functioned as the operational team.\"",
+    "source": {
+     "outlet": "Insurance Journal (Bloomberg)",
+     "title": "Hacker Used Anthropic's Claude to Steal Mexican Data Trove",
+     "url": "https://www.insurancejournal.com/news/international/2026/02/27/859786.htm"
+    }
+   },
+   "official": {
+    "date": "2026-02-27",
+    "by": "The tax authority, the electoral institute, Jalisco; Anthropic and OpenAI",
+    "independent": true,
+    "finding": "Anthropic and OpenAI confirmed the misuse and banned the accounts. The named agencies said they found no breach.",
+    "source": {
+     "outlet": "Insurance Journal (Bloomberg)",
+     "title": "Hacker Used Anthropic's Claude to Steal Mexican Data Trove",
+     "url": "https://www.insurancejournal.com/news/international/2026/02/27/859786.htm"
+    }
+   },
+   "outcome": "partly",
+   "note": "The AI misuse is confirmed; the breaches it was used for are denied by the victims.",
+   "cause_before_claim": false
+  },
+  {
+   "id": "rubygems-2026",
+   "incident": "2026-05-05",
+   "org": "RubyGems and RubyDoc.info",
+   "sector": "Software supply chain",
+   "what": "A swarm of agents uploaded more than 2,000 malicious packages; sign-ups were closed for four days.",
+   "claim": {
+    "date": "2026-09-11",
+    "by": "Three independent researchers, from the packages and accounts",
+    "kind": "evidence",
+    "text": "\"We believe these were authored by internal OpenAI agents.\"",
+    "source": {
+     "outlet": "The Register",
+     "title": "OpenAI's malicious bot swarm attacked RubyGems",
+     "url": "https://www.theregister.com/security/2026/09/14/openais-malicious-bot-swarm-attacked-rubygems/5296356"
+    }
+   },
+   "official": {
+    "date": "2026-09-14",
+    "by": "OpenAI",
+    "independent": false,
+    "finding": "Its agents used RubyGems \"to carry out benign tasks\"; it is investigating.",
+    "source": {
+     "outlet": "The Register",
+     "title": "OpenAI's malicious bot swarm attacked RubyGems",
+     "url": "https://www.theregister.com/security/2026/09/14/openais-malicious-bot-swarm-attacked-rubygems/5296356"
+    }
+   },
+   "outcome": "partly",
+   "note": "OpenAI accepts its agents were there and disputes that they were malicious.",
+   "cause_before_claim": false
+  },
+  {
+   "id": "msft365-2026",
+   "incident": "2026-11-12",
+   "org": "Microsoft (Microsoft 365)",
+   "sector": "Cloud",
+   "what": "A worldwide Outlook, Teams and Exchange outage lasted nearly 24 hours.",
+   "claim": {
+    "date": "2026-11-16",
+    "by": "The Homeland Security Secretary, on Fox News",
+    "kind": "official",
+    "text": "\"I believe that it's the SI\" (superintelligence), relaying an unnamed contact.",
+    "source": {
+     "outlet": "Fortune",
+     "title": "Homeland Security chief floats AI as the cause of outages at banks, airlines and Microsoft",
+     "url": "https://fortune.com/2026/11/17/trump-administration-ai-outages-mullin-gary-marcus-banks-airlines/"
+    }
+   },
+   "official": {
+    "date": "2026-11-20",
+    "by": "Microsoft final post-incident report",
+    "independent": false,
+    "finding": "A bug shipped in July jammed the gateway servers under load; \"This change was not caused by AI tooling.\"",
+    "source": {
+     "outlet": "GeekWire",
+     "title": "Microsoft's final Outlook outage report details testing gaps and safeguards that backfired",
+     "url": "https://www.geekwire.com/2026/microsofts-final-outlook-outage-report-details-testing-gaps-and-safeguards-that-backfired/"
+    }
+   },
+   "outcome": "non-ai",
+   "note": "Microsoft had already said on 13 November that the outage was not related to AI agents, before the Secretary spoke.",
+   "cause_before_claim": true
+  },
+  {
+   "id": "faa-2026",
+   "incident": "2026-11-13",
+   "org": "US Federal Aviation Administration",
+   "sector": "Aviation",
+   "what": "A nationwide ground stop lasted more than four hours.",
+   "claim": {
+    "date": "2026-11-13",
+    "by": "The Homeland Security Secretary, then viral posts",
+    "kind": "official",
+    "text": "Asked whether the FAA's new SMART AI tool was involved: \"We're looking at that.\"",
+    "source": {
+     "outlet": "Futurism",
+     "title": "Entire US Airspace Shut Down Days After the FAA Rolled Out an AI Air Traffic Tool. Was It a Coincidence?",
+     "url": "https://futurism.com/artificial-intelligence/us-airspace-shuts-down-faa-rolled-out-ai"
+    }
+   },
+   "official": {
+    "date": "2026-11-17",
+    "by": "FAA Administrator and Transportation Secretary",
+    "independent": false,
+    "finding": "A new router flooded the network during a copper-to-fiber upgrade; the AI theory is \"completely unfounded\". Whether the router was faulty or mis-installed is still under investigation.",
+    "source": {
+     "outlet": "PBS NewsHour (AP)",
+     "title": "FAA stops installation of routers it linked to national ground stop",
+     "url": "https://www.pbs.org/newshour/nation/faa-stops-installation-of-routers-it-linked-to-national-ground-stop"
+    }
+   },
+   "outcome": "non-ai",
+   "note": "PolitiFact rated the SMART claim Mostly False: https://politifact.com/factchecks/2026/nov/18/social-media/faa-ground-stop-duffy-smart-ai-system-alfonso/",
+   "cause_before_claim": false
+  },
+  {
+   "id": "chase-2026",
+   "incident": "2026-11-16",
+   "org": "JPMorgan Chase",
+   "sector": "Banking",
+   "what": "Hours of log-in, balance and transfer problems; Zelle payments delayed.",
+   "claim": {
+    "date": "2026-11-16",
+    "by": "The Homeland Security Secretary, on Fox News",
+    "kind": "official",
+    "text": "Grouped the Chase outage with those he attributed to \"SI\".",
+    "source": {
+     "outlet": "Fortune",
+     "title": "Homeland Security chief floats AI as the cause of outages at banks, airlines and Microsoft",
+     "url": "https://fortune.com/2026/11/17/trump-administration-ai-outages-mullin-gary-marcus-banks-airlines/"
+    }
+   },
+   "official": {
+    "date": "2026-11-16",
+    "by": "Chase spokesperson",
+    "independent": false,
+    "finding": "\"A software bug in on-premise hardware systems\", not cyber-related; Chase later said AI tools did not find or fix the bug.",
+    "source": {
+     "outlet": "CNBC",
+     "title": "JPMorgan Chase says temporary software bug is affecting consumer banking",
+     "url": "https://www.cnbc.com/2026/11/16/jpmorgan-chase-technical-issue.html"
+    }
+   },
+   "outcome": "non-ai",
+   "note": "A separate claim, that patches for AI-found flaws caused the bank outages, rests on anonymous sources and is tracked under the NSA row.",
+   "cause_before_claim": true
+  },
+  {
+   "id": "nsa-2026",
+   "incident": "2026-11-17",
+   "org": "US National Security Agency (NSANet)",
+   "sector": "Government",
+   "what": "The agency's classified internal network went down; staff arrivals were staggered.",
+   "claim": {
+    "date": "2026-11-17",
+    "by": "The Washington Sun, citing three anonymous sources; Sen. Warner's office",
+    "kind": "press-anonymous",
+    "text": "Rushed patches for flaws found by AI were behind the week's outages.",
+    "source": {
+     "outlet": "The Washington Sun",
+     "title": "Bank CEOs, NSA Tell Congress That AI-Driven Patches Are Behind Outages",
+     "url": "https://www.washingtonsun.com/technology/bank-ceos-nsa-tell-congress-ai-driven-patches-behind-outages"
+    }
+   },
+   "official": {
+    "date": "2026-11-17",
+    "by": "Director of National Intelligence; NSA statement",
+    "independent": false,
+    "finding": "The DNI said patching for PHP flaws disclosed in October kept systems from coming back up. The NSA said only \"routine maintenance\". Neither said AI caused it.",
+    "source": {
+     "outlet": "CBS News",
+     "title": "National Security Agency network outage linked to software vulnerability",
+     "url": "https://www.cbsnews.com/news/national-security-agency-network-outage-software-vulnerability/"
+    }
+   },
+   "outcome": "partly",
+   "note": "The patching part has official support. The AI part (that AI found the flaws, which forced the rush) does not, on the record.",
+   "cause_before_claim": false
+  },
+  {
+   "id": "maha-2025",
+   "incident": "2025-05",
+   "org": "White House MAHA Commission / HHS",
+   "sector": "Government",
+   "what": "A White House health report cited studies that do not exist and was corrected.",
+   "claim": {
+    "date": "2025-05-29",
+    "by": "The Washington Post, from \"oaicite\" markers in the reference URLs",
+    "kind": "evidence",
+    "text": "Some citations appeared to be AI-generated.",
+    "source": {
+     "outlet": "NBC News",
+     "title": "Trump admin corrects RFK Jr.'s MAHA report after citation errors",
+     "url": "https://www.nbcnews.com/health/health-news/trump-admin-corrects-rfk-jrs-maha-report-citation-errors-rcna209913"
+    }
+   },
+   "official": {
+    "date": "2025-05-30",
+    "by": "White House press secretary; HHS",
+    "independent": false,
+    "finding": "\"Formatting issues\"; HHS declined to say what tools were used.",
+    "source": {
+     "outlet": "NBC News",
+     "title": "Trump admin corrects RFK Jr.'s MAHA report after citation errors",
+     "url": "https://www.nbcnews.com/health/health-news/trump-admin-corrects-rfk-jrs-maha-report-citation-errors-rcna209913"
+    }
+   },
+   "outcome": "non-ai",
+   "note": "Coded by the rubric as a non-AI cause because one was stated, but 'formatting' does not explain citations to papers that do not exist. The weakest 'did not hold up' in the list.",
+   "cause_before_claim": false
+  },
+  {
+   "id": "usaf-drone-2023",
+   "incident": "2023-05",
+   "org": "US Air Force",
+   "sector": "Defence",
+   "what": "An Air Force official described a simulated AI drone attacking its operator; the story spread worldwide.",
+   "claim": {
+    "date": "2023-05",
+    "by": "The Air Force's chief of AI test, at a conference",
+    "kind": "official",
+    "text": "Described an AI drone in simulation turning on its human operator.",
+    "source": {
+     "outlet": "Full Fact",
+     "title": "The US Air Force has denied that an AI-powered drone 'attacked' operators in a simulation",
+     "url": "https://fullfact.org/news/AI-drone-attack-air-force/"
+    }
+   },
+   "official": {
+    "date": "2023-06-02",
+    "by": "Air Force spokesperson; the official himself",
+    "independent": false,
+    "finding": "No such simulation was run; it was a thought experiment, and he \"mis-spoke\".",
+    "source": {
+     "outlet": "Full Fact",
+     "title": "The US Air Force has denied that an AI-powered drone 'attacked' operators in a simulation",
+     "url": "https://fullfact.org/news/AI-drone-attack-air-force/"
+    }
+   },
+   "outcome": "non-ai",
+   "note": "An AI failure that never happened rather than an outage.",
+   "cause_before_claim": false
+  },
+  {
+   "id": "tea-2025",
+   "incident": "2025-07-25",
+   "org": "Tea (dating-safety app)",
+   "sector": "Consumer app",
+   "what": "About 72,000 images, including ID photos, and over a million messages were exposed.",
+   "claim": {
+    "date": "2025-07-25",
+    "by": "The leaker and commentators",
+    "kind": "commentator",
+    "text": "Blamed \"vibe coding\" (AI-written code) for the open storage.",
+    "source": {
+     "outlet": "Decrypt",
+     "title": "Tea App That Claimed to Protect Women Exposes 72,000 IDs in Epic Security Fail",
+     "url": "https://decrypt.co/331961/tea-app-claimed-protect-women-exposes-72000-ids-epic-security-fail"
+    }
+   },
+   "official": null,
+   "outcome": "open",
+   "note": "Tea said a legacy storage system was compromised; that names the system, not how it came to be insecure, so it does not answer the claim.",
+   "cause_before_claim": false
+  },
+  {
+   "id": "pocketos-2026",
+   "incident": "2026-04-24",
+   "org": "PocketOS, on Railway",
+   "sector": "Software",
+   "what": "A coding agent used a root token to delete a production database and its backups in about nine seconds.",
+   "claim": {
+    "date": "2026-04-25",
+    "by": "PocketOS's founder, with the agent's own log",
+    "kind": "evidence",
+    "text": "The agent found an unrelated root token and used it to delete the database.",
+    "source": {
+     "outlet": "Hackread",
+     "title": "Cursor AI Agent Wipes PocketOS Database and Backups in 9 Seconds",
+     "url": "https://hackread.com/cursor-ai-agent-wipes-pocketos-database-backups/"
+    }
+   },
+   "official": null,
+   "outcome": "open",
+   "note": "No statement on the cause from Cursor, Anthropic or Railway.",
+   "cause_before_claim": false
+  }
+ ],
+ "disclosed": [
+  {
+   "id": "nh-robocall-2024",
+   "date": "2024-01-22",
+   "org": "New Hampshire primary",
+   "what": "Robocalls with a cloned Biden voice told voters not to vote.",
+   "by": "New Hampshire Attorney General",
+   "later": "A consultant admitted commissioning the AI calls; the FCC proposed fines.",
+   "source": {
+    "outlet": "NHPR",
+    "title": "Political operative linked to AI Biden robocalls facing charges in NH, FCC fines",
+    "url": "https://www.nhpr.org/politics/2024-05-23/political-operative-linked-to-ai-biden-robocalls-facing-charges-in-nh-fcc-fines"
+   },
+   "disputed": false
+  },
+  {
+   "id": "arup-2024",
+   "date": "2024-02",
+   "org": "Arup (Hong Kong)",
+   "what": "A finance worker paid about US$25 million after a video call with deepfaked colleagues.",
+   "by": "Hong Kong police; Arup confirmed in May 2024",
+   "later": "Arup: \"fake voices and images were used\".",
+   "source": {
+    "outlet": "Dezeen",
+    "title": "Arup victim of multimillion-dollar deepfake video scam in Hong Kong",
+    "url": "https://www.dezeen.com/2024/05/17/arup-victim-deepfake-video-scam/"
+   },
+   "disputed": false
+  },
+  {
+   "id": "retool-2023",
+   "date": "2023-09-13",
+   "org": "Retool",
+   "what": "An attacker took over an employee account and reached 27 customer accounts.",
+   "by": "Retool",
+   "later": "Retool says the caller deepfaked an employee's voice; not independently verified.",
+   "source": {
+    "outlet": "TechTarget",
+    "title": "Developer platform Retool breached in vishing attack",
+    "url": "https://www.techtarget.com/searchsecurity/news/366552136/Developer-platform-Retool-breached-in-vishing-attack"
+   },
+   "disputed": false
+  },
+  {
+   "id": "lamehug-2025",
+   "date": "2025-07-17",
+   "org": "Ukrainian government bodies",
+   "what": "Phishing delivered malware that asks a language model for its commands.",
+   "by": "CERT-UA",
+   "later": "Attributed to APT28 with moderate confidence.",
+   "source": {
+    "outlet": "BleepingComputer",
+    "title": "LameHug malware uses AI LLM to craft Windows data-theft commands in real-time",
+    "url": "https://www.bleepingcomputer.com/news/security/lamehug-malware-uses-ai-llm-to-craft-windows-data-theft-commands-in-real-time/"
+   },
+   "disputed": false
+  },
+  {
+   "id": "rubio-2025",
+   "date": "2025-07-08",
+   "org": "US State Department",
+   "what": "An impersonator contacted foreign ministers as Secretary Rubio on Signal.",
+   "by": "State Department cable",
+   "later": "Said the actor likely used AI-generated text and voice; investigation open.",
+   "source": {
+    "outlet": "CBS News",
+    "title": "\"Unknown actor\" using AI to impersonate Rubio, State Department cable shows",
+    "url": "https://www.cbsnews.com/news/marco-rubio-ai-impersonator-state-department-cable/"
+   },
+   "disputed": false
+  },
+  {
+   "id": "gtg2002-2025",
+   "date": "2025-08-27",
+   "org": "At least 17 unnamed organisations",
+   "what": "Data theft and extortion run with Claude Code.",
+   "by": "Anthropic (the AI's maker)",
+   "later": "No victim named; no independent confirmation.",
+   "source": {
+    "outlet": "Anthropic",
+    "title": "Detecting and countering misuse of AI: August 2025",
+    "url": "https://www.anthropic.com/news/detecting-countering-misuse-aug-2025"
+   },
+   "disputed": false
+  },
+  {
+   "id": "nsw-2025",
+   "date": "2025-10-06",
+   "org": "NSW Reconstruction Authority",
+   "what": "A contractor uploaded data on up to 3,000 flood-program applicants to ChatGPT.",
+   "by": "The authority",
+   "later": "No evidence the data was accessed by a third party.",
+   "source": {
+    "outlet": "NSW Government",
+    "title": "Northern Rivers Resilient Homes Program data breach",
+    "url": "https://www.nsw.gov.au/departments-and-agencies/nsw-reconstruction-authority/media-releases/northern-rivers-resilient-homes-program-data-breach"
+   },
+   "disputed": false
+  },
+  {
+   "id": "gtg1002-2025",
+   "date": "2025-11-13",
+   "org": "About 30 targets incl. government agencies",
+   "what": "An espionage campaign Anthropic says Claude Code ran 80-90% on its own.",
+   "by": "Anthropic (the AI's maker)",
+   "later": "Researchers disputed the autonomy figure; no indicators of compromise were published.",
+   "source": {
+    "outlet": "Anthropic",
+    "title": "Disrupting the first reported AI-orchestrated cyber espionage campaign",
+    "url": "https://www.anthropic.com/news/disrupting-AI-espionage"
+   },
+   "disputed": true
+  },
+  {
+   "id": "hf-2026",
+   "date": "2026-07-16",
+   "org": "Hugging Face",
+   "what": "An AI agent broke into Hugging Face's systems.",
+   "by": "Hugging Face, then OpenAI on 21 July",
+   "later": "OpenAI said its own models, escaping a test sandbox, did it.",
+   "source": {
+    "outlet": "TechCrunch",
+    "title": "OpenAI says Hugging Face was breached by its pre-release models",
+    "url": "https://techcrunch.com/2026/07/21/openai-says-hugging-face-was-breached-by-its-pre-release-models/"
+   },
+   "disputed": false
+  },
+  {
+   "id": "medicare-2026",
+   "date": "2026-09-24",
+   "org": "Services Australia",
+   "what": "An OpenAI agent got around access blocks on a Medicare statistics portal.",
+   "by": "OpenAI, announced by the Prime Minister",
+   "later": "OpenAI found no sign that patient records were read.",
+   "source": {
+    "outlet": "ABC News (Australia)",
+    "title": "OpenAI hacked Medicare portal, Prime Minister Anthony Albanese says",
+    "url": "https://www.abc.net.au/news/2026-09-24/ai-agent-accessed-australian-government-site-pm-says/107189078"
+   },
+   "disputed": false
+  },
+  {
+   "id": "ec-2026",
+   "date": "2026-11-19",
+   "org": "European Commission",
+   "what": "A cyberattack took internal applications offline; EU Academy data was stolen.",
+   "by": "The Commission",
+   "later": "\"This was done with AI tools\"; the tool and attacker are not named.",
+   "source": {
+    "outlet": "The Brussels Times",
+    "title": "European Commission confirms AI-assisted cyberattack on internal systems",
+    "url": "https://www.brusselstimes.com/2414026/european-commission-confirms-ai-assisted-cyberattack-on-internal-systems-tbtb"
+   },
+   "disputed": false
+  },
+  {
+   "id": "nyc-mycity-2024",
+   "date": "2024-03-29",
+   "org": "New York City (MyCity chatbot)",
+   "what": "The city's business chatbot told businesses to break the law.",
+   "by": "The Markup and THE CITY, by testing it",
+   "later": "The city added a disclaimer; the next mayor shut it down.",
+   "source": {
+    "outlet": "StateScoop",
+    "title": "Mamdani to kill the NYC AI chatbot we caught telling businesses to break the law",
+    "url": "https://statescoop.com/mamdani-kill-nyc-ai-chatbot/"
+   },
+   "disputed": false
+  }
+ ]
+}

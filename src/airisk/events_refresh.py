@@ -64,7 +64,7 @@ SUBMIT_TOOL: dict[str, Any] = {
     "input_schema": {
         "type": "object",
         "additionalProperties": False,
-        "required": ["additions", "updates", "notes"],
+        "required": ["additions", "updates", "claim_updates", "notes"],
         "properties": {
             "additions": {
                 "type": "array",
@@ -117,6 +117,23 @@ SUBMIT_TOOL: dict[str, Any] = {
                     },
                 },
             },
+            "claim_updates": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "additionalProperties": False,
+                    "required": ["id", "outcome", "by", "date", "finding", "reason", "source"],
+                    "properties": {
+                        "id": {"type": "string", "description": "The claim's id"},
+                        "outcome": {"type": "string", "enum": list(indicators.CLAIM_OUTCOMES)},
+                        "by": {"type": "string", "description": "Who gave the official account"},
+                        "date": {"type": ["string", "null"], "description": "YYYY-MM-DD"},
+                        "finding": {"type": "string"},
+                        "reason": {"type": "string"},
+                        "source": _SOURCE,
+                    },
+                },
+            },
             "notes": {"type": "string"},
         },
     },
@@ -140,6 +157,11 @@ research demos with no real-world victim, or opinion pieces about AI risk in gen
 2. For each listed event, check whether anything has changed: a root cause or post-incident \
 report published, an official confirming or denying an AI link, new investigation findings. \
 Propose an update only when new reporting changes what the row says.
+3. For each tracked claim that is still open or only partly settled, check whether an official \
+account has since been given (a root-cause report, an investigator's finding, a court or \
+regulator, the organisation's own statement). Propose a claim update only when one has, coded \
+by this rubric:
+{outcomes}
 
 Rules:
 - Cite only pages you found in this session's searches or fetched, with the URL exactly as \
@@ -163,7 +185,7 @@ def today_utc() -> str:
     return datetime.now(UTC).date().isoformat()
 
 
-def prompt(events: dict, today: str) -> str:
+def prompt(events: dict, today: str, claims: dict | None = None) -> str:
     rows = [
         {
             "key": key(e),
@@ -179,7 +201,24 @@ def prompt(events: dict, today: str) -> str:
         f"Today is {today}. The list was last searched on {events['as_of']}.\n\n"
         "The events listed now (one JSON object per line):\n"
         + "\n".join(json.dumps(r, ensure_ascii=False) for r in rows)
-        + "\n\nSearch for new events and for changes to these, then call submit_changes."
+        + "\n\nThe tracked claims still open or partly settled (one JSON object per line):\n"
+        + "\n".join(
+            json.dumps(
+                {
+                    "id": c["id"],
+                    "org": c["org"],
+                    "incident": c["incident"],
+                    "claim": c["claim"]["text"],
+                    "outcome": c["outcome"],
+                    "official": (c.get("official") or {}).get("finding"),
+                },
+                ensure_ascii=False,
+            )
+            for c in (claims or {"claims": []})["claims"]
+            if c["outcome"] in ("open", "partly")
+        )
+        + "\n\nSearch for new events, for changes to these, and for official accounts of the "
+        "open claims, then call submit_changes."
     )
 
 
@@ -187,7 +226,11 @@ def system_prompt(events: dict, since: str) -> str:
     grades = "\n".join(
         f'- "{k}": {events["links"][k][0]}. {events["links"][k][1]}' for k in indicators.EVENT_LINKS
     )
-    return SYSTEM.format(grades=grades, since=since)
+    outcomes = "\n".join(
+        f'- "{k}": {v[0]}. {v[1]}'
+        for k, v in indicators.claims_base()["rubric"]["outcomes"].items()
+    )
+    return SYSTEM.format(grades=grades, since=since, outcomes=outcomes)
 
 
 def _seen_urls(content: list) -> set[str]:
@@ -203,7 +246,13 @@ def _seen_urls(content: list) -> set[str]:
     return out
 
 
-def ask_claude(events: dict, today: str, client: Any = None, log: Callable | None = None) -> dict:
+def ask_claude(
+    events: dict,
+    today: str,
+    client: Any = None,
+    log: Callable | None = None,
+    claims: dict | None = None,
+) -> dict:
     """Run the search; return Claude's proposal, the URLs it saw, and token use."""
     if client is None:
         import anthropic
@@ -215,7 +264,7 @@ def ask_claude(events: dict, today: str, client: Any = None, log: Callable | Non
         SUBMIT_TOOL,
     ]
     system = system_prompt(events, events["as_of"])
-    messages: list[dict] = [{"role": "user", "content": prompt(events, today)}]
+    messages: list[dict] = [{"role": "user", "content": prompt(events, today, claims)}]
     seen: set[str] = set()
     usage: dict[str, Any] = {
         "input_tokens": 0,
@@ -310,6 +359,7 @@ def merge(
     today: str,
     seen: set[str] | list[str],
     check: Callable[[str], int] = url_status,
+    claims: dict | None = None,
 ) -> tuple[dict, dict]:
     """Check Claude's proposal and fold what passes into the overlay.
 
@@ -324,7 +374,8 @@ def merge(
     listed = {key(e): e for e in base["events"]}
     added_by_key = {key(e): e for e in auto["additions"] if key(e) not in listed}
     cited = {s["url"]: k for k, e in {**listed, **added_by_key}.items() for s in e["sources"]}
-    decisions: dict[str, list] = {"added": [], "updated": [], "rejected": []}
+    decisions: dict[str, list] = {"added": [], "updated": [], "resolved": [], "rejected": []}
+    auto.setdefault("claims", {})
 
     for a in proposal.get("additions") or []:
         name = f"{a.get('date', '?')}|{a.get('org', '?')}"
@@ -400,6 +451,52 @@ def merge(
             auto["updates"][k] = entry
         decisions["updated"].append(k)
 
+    tracked = {c["id"]: c for c in (claims or {"claims": []})["claims"]}
+    for u in proposal.get("claim_updates") or []:
+        cid = u.get("id") or ""
+        why = []
+        c = tracked.get(cid)
+        if c is None:
+            why.append("no tracked claim has this id")
+        elif c["outcome"] not in ("open", "partly"):
+            why.append(f"claim is already settled ({c['outcome']})")
+        if u.get("outcome") not in indicators.CLAIM_OUTCOMES:
+            why.append(f"unknown outcome {u.get('outcome')!r}")
+        for f in ("by", "finding", "reason"):
+            if not (u.get(f) or "").strip():
+                why.append(f"missing {f}")
+        d = u.get("date")
+        if d is not None:
+            try:
+                datetime.strptime(d, "%Y-%m-%d")
+            except ValueError:
+                why.append(f"date not YYYY-MM-DD: {d!r}")
+        srcs = _sources([u.get("source") or {}], seen, check, why) if not why else []
+        if not why and not srcs:
+            why.append("no usable source")
+        if not why and c is not None:
+            same = u["outcome"] == c["outcome"] and u["finding"].strip() == (
+                (c.get("official") or {}).get("finding") or ""
+            )
+            if same:
+                why.append("changes nothing")
+        if why:
+            decisions["rejected"].append({"claim": cid, "why": why})
+            continue
+        auto["claims"][cid] = {
+            "outcome": u["outcome"],
+            "official": {
+                "date": d,
+                "by": u["by"].strip(),
+                "independent": False,
+                "finding": u["finding"].strip(),
+                "source": srcs[0],
+            },
+            "on": today,
+            "reason": u["reason"].strip(),
+        }
+        decisions["resolved"].append(cid)
+
     auto["runs"] = (
         auto["runs"]
         + [
@@ -407,6 +504,7 @@ def merge(
                 "date": today,
                 "added": len(decisions["added"]),
                 "updated": len(decisions["updated"]),
+                "resolved": len(decisions["resolved"]),
                 "rejected": len(decisions["rejected"]),
             }
         ]
@@ -424,9 +522,13 @@ def refresh(log: Callable | None = None, client: Any = None) -> dict:
     base = indicators.events_base()
     ap = events_auto_path()
     auto = json.loads(S.read_text(ap)) if S.exists(ap) else None
-    asked = ask_claude(indicators.apply_auto(base, auto), today, client=client, log=log)
-    new_auto, decisions = merge(base, auto, asked["proposal"], today, asked["seen"])
+    tracked = indicators.claims(auto)
+    asked = ask_claude(
+        indicators.apply_auto(base, auto), today, client=client, log=log, claims=tracked
+    )
+    new_auto, decisions = merge(base, auto, asked["proposal"], today, asked["seen"], claims=tracked)
     indicators.validate_events(indicators.apply_auto(base, new_auto))
+    indicators.claims(new_auto)
     lp = events_log_path(today)
     for p in (ap, lp):
         if not is_remote(p):
@@ -438,16 +540,17 @@ def refresh(log: Callable | None = None, client: Any = None) -> dict:
     S.write_text(ap, json.dumps(new_auto, indent=1, ensure_ascii=False, sort_keys=True))
     if log:
         for r in decisions["rejected"]:
-            what = r.get("addition") or r.get("update")
+            what = r.get("addition") or r.get("update") or r.get("claim")
             log(f"rejected {what}: {'; '.join(r['why'])}", level="warning")
         log(
             f"added {len(decisions['added'])}, updated {len(decisions['updated'])}, "
-            f"rejected {len(decisions['rejected'])}",
+            f"claims resolved {len(decisions['resolved'])}, rejected {len(decisions['rejected'])}",
             level="info",
         )
     return {
         "added": len(decisions["added"]),
         "updated": len(decisions["updated"]),
+        "resolved": len(decisions["resolved"]),
         "rejected": len(decisions["rejected"]),
         "as_of": today,
         "log_path": lp,

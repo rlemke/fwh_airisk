@@ -103,7 +103,7 @@ def handle_events_refresh(params: dict[str, Any]) -> dict[str, Any]:
     from ..events_refresh import refresh
 
     out = refresh(log=params.get("_step_log"))
-    return {k: out[k] for k in ("added", "updated", "rejected", "as_of", "log_path")}
+    return {k: out[k] for k in ("added", "updated", "resolved", "rejected", "as_of", "log_path")}
 
 
 _DISPATCH: dict[str, Callable[[dict], dict]] = {

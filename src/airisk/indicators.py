@@ -494,6 +494,51 @@ def validate_events(d: dict) -> dict:
     return d
 
 
+CLAIM_OUTCOMES = ("confirmed", "partly", "non-ai", "open")
+CLAIMANT_KINDS = ("official", "commentator", "press-anonymous", "evidence")
+
+
+def claims_base() -> dict:
+    """Early claims that AI was behind an outage or hack (``data/claims.json``)."""
+    return json.loads((Path(__file__).parent / "data" / "claims.json").read_text(encoding="utf-8"))
+
+
+def claims(auto: dict | None = None) -> dict:
+    """The claims with the weekly search's resolutions applied, validated.
+
+    An entry in ``auto["claims"]`` replaces a claim's outcome and official
+    account and is marked (``auto_resolved``). A curated outcome other than
+    "open" or "partly" is never changed by the search.
+    """
+    d = json.loads(json.dumps(claims_base()))
+    if set(d["rubric"]["outcomes"]) != set(CLAIM_OUTCOMES):
+        raise ValueError(f"claims.json outcomes must be exactly {CLAIM_OUTCOMES}")
+    by_id = {c["id"]: c for c in d["claims"]}
+    if len(by_id) != len(d["claims"]):
+        raise ValueError("claims.json: duplicate claim id")
+    for cid, r in ((auto or {}).get("claims") or {}).items():
+        c = by_id.get(cid)
+        if c is None or c["outcome"] not in ("open", "partly"):
+            continue
+        c["outcome"] = r["outcome"]
+        c["official"] = r["official"]
+        c["auto_resolved"] = {"on": r["on"], "reason": r["reason"]}
+    for c in d["claims"]:
+        if c["outcome"] not in CLAIM_OUTCOMES:
+            raise ValueError(f"claim {c['id']}: unknown outcome {c['outcome']!r}")
+        if c["claim"]["kind"] not in CLAIMANT_KINDS:
+            raise ValueError(f"claim {c['id']}: unknown claimant kind {c['claim']['kind']!r}")
+        srcs = [c["claim"]["source"]] + ([c["official"]["source"]] if c.get("official") else [])
+        if not all(s["url"].startswith("https://") for s in srcs):
+            raise ValueError(f"claim {c['id']}: sources must be https")
+        if c["outcome"] != "open" and not c.get("official"):
+            raise ValueError(f"claim {c['id']}: a resolved claim needs its official account")
+    for x in d["disclosed"]:
+        if not x["source"]["url"].startswith("https://"):
+            raise ValueError(f"disclosed {x['id']}: sources must be https")
+    return d
+
+
 def events(auto: dict | None = None) -> dict:
     """Outages and hacks someone has blamed on AI (``data/events.json``).
 

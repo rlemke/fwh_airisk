@@ -88,6 +88,41 @@
     {% for c in events.context %}{{ c.text }} <a href="{{ c.url }}">source</a>{% if not loop.last %}<br>{% endif %}{% endfor %}
   </div>
   <div class="pad t" style="padding-top:0">Causes still under investigation can change. The FAA's root-cause search and Microsoft's final report were not public when this was written. A row moves up or down the scale when the evidence does. Each week an AI model (Claude, with web search) looks for new cases and for new facts on these. A change it proposes is published only if every source it cites came up in its own search, and the rows it added or changed are marked until checked by hand. The AI Incident Database count below is separate and includes these events only once they are reported there.</div>
+<section class="panel section" id="held-up">
+  {% set cl = claims %}
+  <div class="panel-head"><h2>Did the AI blame hold up?</h2><span class="t">{{ cl.n }} early public claims that AI caused or enabled an outage, breach or hack, and what the official account said later. Curated {{ cl.as_of }}; open claims are checked again each week.</span></div>
+  <div class="pad" style="font-size:14px">
+    <p style="margin:0 0 .6rem">Of the {{ cl.unbacked_resolved }} resolved claims made by officials or commentators <b>without evidence</b>, {{ 'none' if cl.unbacked_held == 0 else cl.unbacked_held }} held up. Of the {{ cl.backed_resolved }} resolved claims that came <b>with direct evidence</b> (logs, screenshots, code, the malware itself), {{ cl.backed_held }} held up fully or partly. Claims resting on anonymous sources usually held up in part: AI was involved, but not the way the first report said.</p>
+    <p style="margin:0">This is a small, hand-built sample, and it is not random: it holds the cases that got press coverage and that a search could find. Read it as a first measurement, not a rate. The official account is usually the organisation's own, so a "did not hold up" often means "the organisation that would be blamed says no".{% if cl.median_days is not none %} Where both dates are known ({{ cl.n_days }} claims), the claim and the official account were a median of {{ cl.median_days }} days apart. In {{ cl.n_cause_first }} of the claims made without evidence, the organisation had already named an ordinary cause before the claim was made.{% endif %}</p>
+  </div>
+  <div class="legend" style="padding-top:0">{% for k, label, meaning, badge, n in cl.outcomes %}<span title="{{ meaning }}"><span class="v v-{{ badge }}">{{ label }}</span> {{ n }}</span>{% endfor %}</div>
+  <div class="overflow-x">
+  <table class="dtable">
+    <thead><tr><th>Who made the claim</th><th class="num">Claims</th>{% for k, label, meaning, badge, n in cl.outcomes %}<th class="num">{{ label }}</th>{% endfor %}</tr></thead>
+    <tbody>{% for t in cl.by_kind %}<tr><td>{{ t.about[0]|upper }}{{ t.about[1:] }}</td><td class="num">{{ t.n }}</td>{% for k, label, meaning, badge, n in cl.outcomes %}<td class="num">{{ t[k] }}</td>{% endfor %}</tr>{% endfor %}</tbody>
+  </table>
+  </div>
+  <div class="overflow-x">
+  <table class="dtable">
+    <thead><tr><th>Incident</th><th>The claim</th><th>The official account</th><th>Outcome</th></tr></thead>
+    <tbody>
+    {% for c in cl.claims %}
+      <tr>
+        <td style="min-width:200px"><b>{{ c.org }}</b><div class="t">{{ c.incident }} · {{ c.sector }}</div><div class="t">{{ c.what }}</div></td>
+        <td style="min-width:220px" class="t"><span style="color:var(--text-1)">{{ c.claim.by }}</span>{% if c.claim.date %}, {{ c.claim.date }}{% endif %}: {{ c.claim.text }} <a href="{{ c.claim.source.url }}">{{ c.claim.source.outlet }}</a></td>
+        <td style="min-width:220px" class="t">{% if c.official %}<span style="color:var(--text-1)">{{ c.official.by }}</span>{% if c.official.date %}, {{ c.official.date }}{% endif %}: {{ c.official.finding }} <a href="{{ c.official.source.url }}">{{ c.official.source.outlet }}</a>{% else %}None yet.{% endif %}{% if c.note %}<div style="margin-top:.3rem">{{ c.note }}</div>{% endif %}
+          {%- if c.auto_resolved %}<div style="margin-top:.3rem;font-style:italic">Updated by the weekly automated search on {{ c.auto_resolved.on }}: {{ c.auto_resolved.reason }}</div>{% endif %}</td>
+        <td><span class="v v-{{ c.badge }}" title="{{ c.meaning }}">{{ c.label }}</span></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  <div class="pad t" style="font-size:13px;color:var(--text-2)">
+    <b>Not counted: {{ cl.disclosed|length }} cases where the AI role was disclosed by the responsible party or investigators from the start</b>, so there was no outside claim to test.
+    {% for x in cl.disclosed %}{{ x.org }} ({{ x.date[:4] }}, {{ x.by }}{% if x.disputed %}; disputed by outside researchers{% endif %}) <a href="{{ x.source.url }}">source</a>{% if not loop.last %} · {% endif %}{% endfor %}.
+  </div>
+  <div class="pad t" style="padding-top:0">{% for n in cl.rubric_notes %}{{ n }} {% endfor %}</div>
 </section>
 
 <div class="grid2 section">

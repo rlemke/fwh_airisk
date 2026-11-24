@@ -179,3 +179,64 @@ def test_the_page_marks_what_the_search_added(sources_dir, tmp_path):
     assert "Example Utility" in index
     assert "Found by the weekly automated search on 2026-11-30" in index
     assert "searched again each week (last 2026-11-30)" in index
+
+
+def test_claims_are_sourced_and_coded():
+    d = indicators.claims()
+    assert len(d["claims"]) >= 15 and d["disclosed"]
+    for c in d["claims"]:
+        assert c["outcome"] in indicators.CLAIM_OUTCOMES
+        assert c["claim"]["source"]["url"].startswith("https://")
+        assert c["outcome"] == "open" or c["official"]
+
+
+def _upd(cid, outcome="non-ai", url=OK):
+    return {
+        "id": cid,
+        "outcome": outcome,
+        "by": "The company",
+        "date": "2026-11-28",
+        "finding": "A configuration error, not AI.",
+        "reason": "Root-cause report published.",
+        "source": {"outlet": "Org", "date": "2026-11-28", "title": "Report", "url": url},
+    }
+
+
+def test_the_search_can_settle_an_open_claim_only():
+    tracked = indicators.claims()
+    open_id = next(c["id"] for c in tracked["claims"] if c["outcome"] == "open")
+    done_id = next(c["id"] for c in tracked["claims"] if c["outcome"] == "confirmed")
+    auto, dec = er.merge(
+        _base(),
+        None,
+        {"claim_updates": [_upd(open_id), _upd(done_id)]},
+        TODAY,
+        {OK},
+        check=lambda u: 200,
+        claims=tracked,
+    )
+    assert dec["resolved"] == [open_id]
+    assert "already settled" in dec["rejected"][0]["why"][0]
+    row = next(c for c in indicators.claims(auto)["claims"] if c["id"] == open_id)
+    assert row["outcome"] == "non-ai" and row["auto_resolved"]["on"] == TODAY
+    # a source the search did not see is refused
+    _, dec2 = er.merge(
+        _base(),
+        None,
+        {"claim_updates": [_upd(open_id, url="https://elsewhere.example/x")]},
+        TODAY,
+        {OK},
+        check=lambda u: 200,
+        claims=tracked,
+    )
+    assert not dec2["resolved"]
+
+
+def test_the_page_shows_whether_the_blame_held_up(sources_dir, tmp_path):
+    from airisk.site import build_site
+
+    build_site(sources_dir, tmp_path / "s", history=[])
+    index = (tmp_path / "s" / "index.html").read_text()
+    paper = (tmp_path / "s" / "paper.html").read_text()
+    assert 'id="held-up"' in index and "Did the AI blame hold up?" in index
+    assert "2.9 Does the blame hold up?" in paper and "{{" not in paper
