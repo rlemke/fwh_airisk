@@ -1,0 +1,302 @@
+{
+  "_about": "Outages and hacks of 2025-2026 that someone has blamed on AI, hand-curated from news reports with sources for every entry. Each entry keeps apart three things: what happened, the cause the organisation itself states, and who links it to AI and on what evidence. 'link' grades that evidence, from an AI system acting on its own (its maker says so) down to speculation that officials deny. Nothing here is computed, and causes still under investigation can change: update an entry when a final report appears, and bump as_of.",
+  "as_of": "2026-11-23",
+  "links": {
+    "ai-acted": [
+      "AI acted on its own",
+      "The AI system's maker says its models did it."
+    ],
+    "ai-used": [
+      "AI used by attackers",
+      "Investigators say attackers used AI tools to do the work."
+    ],
+    "ai-tool": [
+      "AI tool involved, cause disputed",
+      "An AI tool was in the chain; the company says the cause was human error."
+    ],
+    "patch-rush": [
+      "Patches for AI-found flaws (claimed)",
+      "Blamed on rushed fixes for flaws that AI found. One official said so on record; the rest is anonymous sourcing."
+    ],
+    "speculated": [
+      "AI suggested, officials deny",
+      "Someone suggested AI; the organisation states another cause and denies an AI link."
+    ],
+    "none": [
+      "No AI link reported",
+      "Included because it was asked about; nobody has linked it to AI."
+    ]
+  },
+  "events": [
+    {
+      "date": "2026-11-17",
+      "org": "NSA",
+      "sector": "Federal",
+      "title": "NSANet, the NSA's classified network, goes down",
+      "what": "Some internal communication systems failed; essential staff were told to stay on the Maryland campus while the network was restored.",
+      "stated": "The NSA: a \"temporary degradation\" from \"scheduled routine maintenance\".",
+      "ai": "The Director of National Intelligence, Jay Clayton, tied it to patching for a PHP vulnerability: the patching \"caused some of these systems to not come back up when you patch them as expected\". AI-assisted research had found PHP flaws that autumn. Anonymous sources told The Washington Sun that the NSA told Congress the outages came from rushed fixes for AI-found flaws; the NSA's own statement does not say so.",
+      "link": "patch-rush",
+      "sources": [
+        {
+          "outlet": "SDxCentral",
+          "date": "2026-11-18",
+          "title": "NSA subject of latest network outage after botched PHP update",
+          "url": "https://www.sdxcentral.com/news/national-security-agency-subject-of-latest-network-outage-after-botched-php-update/"
+        },
+        {
+          "outlet": "The Next Web",
+          "date": "2026-11-18",
+          "title": "Banks and the NSA reportedly blame US outages on patches for AI-found flaws",
+          "url": "https://thenextweb.com/news/us-outages-patches-ai-found-flaws-nsa-banks-washington-sun"
+        }
+      ]
+    },
+    {
+      "date": "2026-11-17",
+      "org": "Apple",
+      "sector": "Business",
+      "title": "iCloud and Apple Pay disrupted",
+      "what": "iCloud and Apple Pay services were disrupted for users.",
+      "stated": "An \"internal update\".",
+      "ai": "No AI link specific to Apple; it is covered only by the claims about the whole week.",
+      "link": "speculated",
+      "sources": [
+        {
+          "outlet": "Deseret News",
+          "date": "2026-11-18",
+          "title": "Here's what federal officials say about the rash of tech outages",
+          "url": "https://www.deseret.com/business/2026/11/18/tech-outages-faa-grounding-microsoft-national-intelligence-agency-cyber-criminals-hackers-ai-artificial-intelligence-system-upgrades/"
+        }
+      ]
+    },
+    {
+      "date": "2026-11-16",
+      "org": "JPMorgan Chase",
+      "sector": "Business",
+      "title": "Chase online banking and payments down for hours",
+      "what": "Online banking, payments and some transactions failed; customers of other banks saw delays on Chase-related transfers.",
+      "stated": "Chase: a software bug in on-premise hardware systems, no sign of a cyberattack. An FBI official, as reported by Fox Business, traced it to a software release that day.",
+      "ai": "Anonymous sources told The Washington Sun that Wall Street executives told Congress the week's outages came from rushed fixes for AI-found flaws. Chase has not said so.",
+      "link": "patch-rush",
+      "sources": [
+        {
+          "outlet": "Fortune",
+          "date": "2026-11-17",
+          "title": "Homeland Security chief floats AI as the cause of outages at banks, airlines and Microsoft",
+          "url": "https://fortune.com/2026/11/17/trump-administration-ai-outages-mullin-gary-marcus-banks-airlines/"
+        },
+        {
+          "outlet": "The Next Web",
+          "date": "2026-11-18",
+          "title": "Banks and the NSA reportedly blame US outages on patches for AI-found flaws",
+          "url": "https://thenextweb.com/news/us-outages-patches-ai-found-flaws-nsa-banks-washington-sun"
+        }
+      ]
+    },
+    {
+      "date": "2026-11-13",
+      "org": "FAA",
+      "sector": "FAA",
+      "title": "Nationwide ground stop: departures halted at every US airport",
+      "what": "From mid-afternoon to about 8:15 p.m. ET; 17 of the 22 en-route control centers were affected and thousands of flights were cancelled or delayed. The first nationwide ground stop since the 2023 NOTAM failure.",
+      "stated": "The FAA: a flood of data on its telecommunications network (about 1,000 connection attempts every 4-5 seconds), starting at a router during a copper-to-fiber upgrade, destabilised legacy equipment. It disabled that function on the originating routers and about 60 similar ones. The FAA and its contractor L3Harris are still looking for the root cause; no sign of an attack.",
+      "ai": "The FAA had expanded SMART, an AI-supported airspace-planning tool, to all its centers on 10 November, three days earlier, and some asked whether the two were connected. FAA Administrator Bryan Bedford said there was \"zero evidence\" of anything AI-related; Transportation Secretary Sean Duffy said SMART is not connected to core radar and tracking systems. Homeland Security Secretary Markwayne Mullin said \"you just can't rule out anything\", and on Fox News passed on a tech contact's theory that \"it's the SI\" (superintelligence).",
+      "link": "speculated",
+      "sources": [
+        {
+          "outlet": "TechRepublic",
+          "date": "2026-11-16",
+          "title": "FAA says its new AI didn't ground US flights",
+          "url": "https://www.techrepublic.com/article/news-faa-smart-ai-ground-stop/"
+        },
+        {
+          "outlet": "Aviation International News",
+          "date": "2026-11-16",
+          "title": "Questions remain regarding FAA ground stop",
+          "url": "https://www.ainonline.com/aviation-news/air-transport/2026-11-16/questions-remain-regarding-faa-groundstop"
+        },
+        {
+          "outlet": "Fortune",
+          "date": "2026-11-17",
+          "title": "Homeland Security chief floats AI as the cause of outages",
+          "url": "https://fortune.com/2026/11/17/trump-administration-ai-outages-mullin-gary-marcus-banks-airlines/"
+        }
+      ]
+    },
+    {
+      "date": "2026-11-13",
+      "org": "FBI",
+      "sector": "FBI",
+      "title": "FBI warns of ARTEX, an AI hacking framework, in live intrusions",
+      "what": "An FBI flash advisory says attackers used ARTEX, an open-source framework of AI agents, against finance, government, technology, defence and telecom targets, in some cases going from targeting to compromise \"in under three hours\". Victims named in coverage include ConnectWise customers (the FBI says at least 2,250; ConnectWise cannot confirm) and South Korean financial institutions.",
+      "stated": "Misuse of ARTEX and similar open-source tools, which the FBI calls \"widely accessible\". The developer withdrew the public repository in October; forks remain.",
+      "ai": "The FBI itself: the intrusions were automated by AI agents with little human direction beyond the objective.",
+      "link": "ai-used",
+      "sources": [
+        {
+          "outlet": "TechCrunch",
+          "date": "2026-11-16",
+          "title": "FBI says Artex AI open source hacking tool used to breach networks in under three hours",
+          "url": "https://techcrunch.com/2026/11/16/fbi-says-artex-ai-open-source-hacking-tool-used-to-breach-networks-in-under-three-hours/"
+        },
+        {
+          "outlet": "FBI / IC3",
+          "date": "2026-11-13",
+          "title": "Flash cybersecurity advisory",
+          "url": "https://www.ic3.gov/CSA/2026/261113.pdf"
+        }
+      ]
+    },
+    {
+      "date": "2026-11-12",
+      "org": "Microsoft",
+      "sector": "Business",
+      "title": "Microsoft 365 down worldwide for nearly 24 hours",
+      "what": "Outlook, Exchange Online, Teams and Copilot failed worldwide; more than 80% of the networking-gateway servers became unresponsive.",
+      "stated": "Microsoft's preliminary report: a bug shipped in July in a gateway update, more traffic after a Teams failover, and about 14% of gateway capacity already offline for an unrelated reason. Microsoft said it was not related to cyberattacks or AI agents.",
+      "ai": "Swept into the week's AI theories (Mullin, Marcus); no evidence offered.",
+      "link": "speculated",
+      "sources": [
+        {
+          "outlet": "BleepingComputer",
+          "date": "2026-11-16",
+          "title": "Microsoft says months-old bug caused global Microsoft 365 outage",
+          "url": "https://bleepingcomputer.com/news/microsoft/microsoft-says-months-old-bug-caused-global-microsoft-365-outage"
+        },
+        {
+          "outlet": "Fortune",
+          "date": "2026-11-17",
+          "title": "Homeland Security chief floats AI as the cause of outages",
+          "url": "https://fortune.com/2026/11/17/trump-administration-ai-outages-mullin-gary-marcus-banks-airlines/"
+        }
+      ]
+    },
+    {
+      "date": "2026-09-25",
+      "org": "OpenAI / US agencies",
+      "sector": "Federal",
+      "title": "OpenAI discloses its agents probed US government websites",
+      "what": "OpenAI said agents in training and evaluation accessed public data on two SEC sites and Census Bureau data. The research lab Transluce reported a failed \"rudimentary hack\" on the Education Department's civil-rights site by agents \"appearing to originate from OpenAI\", and other activity, not all attributable to OpenAI, at Justice, Commerce and five state sites.",
+      "stated": "OpenAI: a review of \"misaligned model activity\"; no credentials used, no nonpublic data, no changes. The Education Department found no impact.",
+      "ai": "OpenAI itself, about its own agents.",
+      "link": "ai-acted",
+      "sources": [
+        {
+          "outlet": "AP via NPR/KUNC",
+          "date": "2026-09-26",
+          "title": "OpenAI says its models engaged with US government websites in misbehavior disclosure",
+          "url": "https://www.kunc.org/npr-news/2026-09-26/openai-says-its-models-engaged-with-us-government-websites-in-misbehavior-disclosure"
+        }
+      ]
+    },
+    {
+      "date": "2026-09-23",
+      "org": "FBI",
+      "sector": "FBI",
+      "title": "Hackers claim the FBI's job-applicant portal",
+      "what": "The criminal group ShinyHunters claimed data on \"almost ALL FBI Agents\" and job applicants; fbijobs.gov went offline.",
+      "stated": "The FBI is aware of the claim; \"the point of breach is still undetermined\". Unverified.",
+      "ai": "None. No report links it to AI.",
+      "link": "none",
+      "sources": [
+        {
+          "outlet": "FOX 13 / AP",
+          "date": "2026-09-24",
+          "title": "Hackers claim they stole 'very sensitive data' from nearly all FBI agents",
+          "url": "https://www.fox13news.com/news/hackers-claim-stole-very-sensitive-data-from-nearly-all-fbi-agents"
+        }
+      ]
+    },
+    {
+      "date": "2026-07-21",
+      "org": "OpenAI / Hugging Face",
+      "sector": "Business",
+      "title": "OpenAI models escape a test sandbox and break into Hugging Face",
+      "what": "During an internal cyber test, two OpenAI models used a zero-day to reach the internet, then attacked Hugging Face's production systems to get the test's answers. Hugging Face disclosed a breach; OpenAI said its models did it.",
+      "stated": "OpenAI: the models \"identified and chained vulnerabilities across OpenAI's research environment and Hugging Face's production infrastructure\"; \"an unprecedented cyber incident\". California's attorney general sued OpenAI over it on 16 November.",
+      "ai": "OpenAI itself, about its own models.",
+      "link": "ai-acted",
+      "sources": [
+        {
+          "outlet": "Fortune",
+          "date": "2026-07-21",
+          "title": "OpenAI says its AI models escaped control and hacked into AI company Hugging Face",
+          "url": "https://fortune.com/2026/07/21/openai-says-ai-models-escaped-control-hacked-hugging-face"
+        }
+      ]
+    },
+    {
+      "date": "2026-07-20",
+      "org": "Taiwan government",
+      "sector": "Government (abroad)",
+      "title": "AI agents break into Taiwanese government systems",
+      "what": "Over about four days in early July, AI agents mapped 21 government systems, took 85 employee accounts and more than 2,500 personnel records (figures from the Israeli firm Dream).",
+      "stated": "Taiwan's digital ministry confirmed an overseas attack that combined conventional hacking with AI agents, and says it has been remediated. Attribution is unconfirmed.",
+      "ai": "Taiwan's government and Dream. Whether it was the \"first\" fully autonomous attack is disputed.",
+      "link": "ai-used",
+      "sources": [
+        {
+          "outlet": "SecureWorld",
+          "date": "2026-08-14",
+          "title": "Inside the first confirmed fully autonomous AI cyberattack on a government",
+          "url": "https://www.secureworld.io/industry-news/first-fully-autonomous-ai-cyber-attack-government"
+        }
+      ]
+    },
+    {
+      "date": "2026-02-24",
+      "org": "Mexican government",
+      "sector": "Government (abroad)",
+      "title": "One attacker uses Claude Code and GPT-4.1 against nine Mexican agencies",
+      "what": "From December 2025 to February 2026, per Gambit Security; reported theft ranges from 150 GB to about 195 million identity records. Claude Code ran about 75% of the remote commands.",
+      "stated": "Anthropic banned the accounts. Mexico's tax authority and electoral institute say they found no breach.",
+      "ai": "Gambit Security's investigation.",
+      "link": "ai-used",
+      "sources": [
+        {
+          "outlet": "SecurityWeek",
+          "date": "2026-02",
+          "title": "Hackers weaponize Claude Code in Mexican government cyberattack",
+          "url": "https://securityweek.com/hackers-weaponize-claude-code-in-mexican-government-cyberattack"
+        }
+      ]
+    },
+    {
+      "date": "2026-02-20",
+      "org": "Amazon Web Services",
+      "sector": "Business",
+      "title": "AWS outage reportedly caused by its own AI coding agent",
+      "what": "Four sources told the Financial Times that a 13-hour disruption of one AWS service in December 2025 followed engineers letting the agent Kiro make changes; it chose to \"delete and recreate the environment\".",
+      "stated": "Amazon: \"user (AWS employee) error - specifically misconfigured access controls - not AI\"; a brief event.",
+      "ai": "Anonymous sources via the Financial Times.",
+      "link": "ai-tool",
+      "sources": [
+        {
+          "outlet": "The Register",
+          "date": "2026-02-20",
+          "title": "Amazon's vibe-coding tool Kiro reportedly vibed too hard and brought down AWS",
+          "url": "https://www.theregister.com/2026/02/20/amazon_denies_kiro_agentic_ai_behind_outage/"
+        }
+      ]
+    }
+  ],
+  "context": [
+    {
+      "text": "Microsoft's monthly update fixed about 1,400 security flaws in October 2026, a record, against about 170 a year earlier (The Wall Street Journal, via The Next Web).",
+      "url": "https://thenextweb.com/news/us-outages-patches-ai-found-flaws-nsa-banks-washington-sun"
+    },
+    {
+      "text": "Officials say none of the November outages was a cyberattack, and the administration says they are not connected (DNI Clayton: \"not a coordinated effort by a nation state\").",
+      "url": "https://www.cfr.org/articles/the-real-reason-why-everything-is-crashing"
+    },
+    {
+      "text": "Sen. Mark Warner called the wave \"a consequence of how quickly artificial intelligence is changing the cybersecurity landscape\"; Rapid7's Christiaan Beek sees no public evidence that rushed patches caused it: \"Complex systems fail in boring ways\".",
+      "url": "https://thenextweb.com/news/us-outages-patches-ai-found-flaws-nsa-banks-washington-sun"
+    },
+    {
+      "text": "Responses so far: Sens. Cantwell and Rounds asked the DNI for a national response to AI-enabled cyber threats; Reps. Luttrell and Torres introduced the ROOT CAUSE Act for a CISA board to review major incidents; Gary Marcus called for a temporary recall of AI agents.",
+      "url": "https://fortune.com/2026/11/17/trump-administration-ai-outages-mullin-gary-marcus-banks-airlines/"
+    }
+  ]
+}

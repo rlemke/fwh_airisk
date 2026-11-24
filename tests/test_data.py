@@ -74,6 +74,16 @@ def test_surveys_have_citations():
     assert all(r["citation"] and r["url"].startswith("https://") for r in s["rounds"])
 
 
+def test_events_are_sourced_and_graded():
+    d = indicators.events()
+    assert d["events"] and d["as_of"]
+    dates = [e["date"] for e in d["events"]]
+    assert dates == sorted(dates, reverse=True)
+    for e in d["events"]:
+        assert e["link"] in indicators.EVENT_LINKS
+        assert e["stated"] and e["ai"] and e["sources"]
+
+
 def test_site_builds_deterministically(sources_dir, tmp_path):
     a = build_site(sources_dir, tmp_path / "a", history=[])
     b = build_site(sources_dir, tmp_path / "b", history=a["history"])
@@ -84,6 +94,7 @@ def test_site_builds_deterministically(sources_dir, tmp_path):
     index = (tmp_path / "a" / "index.html").read_text()
     paper = (tmp_path / "a" / "paper.html").read_text()
     assert "85 seconds" in index and "accelerating" in index
+    assert 'id="blamed"' in index and "None has an official AI cause" in index
     assert "{{" not in paper and "None" not in paper.split("<article")[1].split("References")[0]
     json.dumps(a["summary"])  # the handler returns it through the step store
 

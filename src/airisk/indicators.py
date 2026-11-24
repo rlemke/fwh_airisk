@@ -435,3 +435,31 @@ def doomsday_clock(path: str | Path) -> list[ClockSetting]:
 
 def surveys() -> dict:
     return json.loads((Path(__file__).parent / "data" / "surveys.json").read_text(encoding="utf-8"))
+
+
+EVENT_LINKS = ("ai-acted", "ai-used", "ai-tool", "patch-rush", "speculated", "none")
+
+
+def events() -> dict:
+    """Outages and hacks someone has blamed on AI (``data/events.json``).
+
+    Hand-curated, like the surveys: every entry carries its sources, the
+    cause the organisation states, and a grade of the evidence for an AI
+    link. Validated here so a bad edit fails the build instead of rendering.
+    """
+    d = json.loads((Path(__file__).parent / "data" / "events.json").read_text(encoding="utf-8"))
+    if set(d["links"]) != set(EVENT_LINKS):
+        raise ValueError(f"events.json links must be exactly {EVENT_LINKS}")
+    for e in d["events"]:
+        name = e.get("title", "?")
+        if e.get("link") not in EVENT_LINKS:
+            raise ValueError(f"event {name!r}: unknown link {e.get('link')!r}")
+        for k in ("date", "org", "sector", "what", "stated", "ai"):
+            if not e.get(k):
+                raise ValueError(f"event {name!r}: missing {k}")
+        if not e.get("sources") or not all(
+            s.get("url", "").startswith("https://") for s in e["sources"]
+        ):
+            raise ValueError(f"event {name!r}: every event needs https sources")
+    d["events"].sort(key=lambda e: e["date"], reverse=True)
+    return d

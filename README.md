@@ -53,6 +53,7 @@ All sources are open and need no key. Each is fetched with the built-in `fw.http
 - No open dataset tracks the mitigation side over time: safety research spending, tested safeguards, compute oversight, or rates of deceptive behaviour in deployment. The board shows how fast the drivers move, not whether the brakes keep up.
 - No open series tracks biological uplift, autonomous-weapons deployment or AI in nuclear command and control. GPQA Diamond is a knowledge proxy only.
 - Incident counts measure reports, so they rise with attention. The year in progress always looks low because reports arrive late.
+- Outages and hacks that someone has blamed on AI are hand-curated in `data/events.json`, each with its sources, the cause the organisation states, and a grade of the evidence for an AI link (from "AI acted on its own" down to "AI suggested, officials deny"). Causes under investigation change: update an entry and `as_of` when a final report appears.
 - The survey question wording changed between rounds, and nothing newer than the 2023 round is published. Add a round to `data/surveys.json` when one appears.
 - Benchmarks near their ceiling (Cybench, GPQA) stop measuring progress even while the capability they track keeps growing.
 

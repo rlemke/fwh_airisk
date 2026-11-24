@@ -69,6 +69,7 @@ def load_all(paths: dict[str, str], stamps: dict[str, str] | None = None) -> dic
         ),
         "clock": indicators.doomsday_clock(paths["doomsday_clock"]),
         "surveys": indicators.surveys(),
+        "events": indicators.events(),
     }
 
 
@@ -395,6 +396,37 @@ def _survey_view(s: dict) -> dict:
     }
 
 
+# Strongest evidence of an AI cause first; the badge colour follows it.
+EVENT_BADGE = {
+    "ai-acted": "accelerating",
+    "ai-used": "accelerating",
+    "ai-tool": "steady",
+    "patch-rush": "steady",
+    "speculated": "too",
+    "none": "too",
+}
+
+
+def _events_view(d: dict) -> dict:
+    evs = []
+    for e in d["events"]:
+        label, meaning = d["links"][e["link"]]
+        evs.append({**e, "label": label, "meaning": meaning, "badge": EVENT_BADGE[e["link"]]})
+    counts = {k: sum(1 for e in evs if e["link"] == k) for k in indicators.EVENT_LINKS}
+    nov = [
+        e for e in evs if e["date"] >= "2026-11-12" and e["link"] in ("patch-rush", "speculated")
+    ]
+    return {
+        "events": evs,
+        "links": [(k, *d["links"][k], EVENT_BADGE[k], counts[k]) for k in indicators.EVENT_LINKS],
+        "counts": counts,
+        "wave": nov,
+        "context": d["context"],
+        "as_of": d["as_of"],
+        "about": d["_about"],
+    }
+
+
 def summarize(views: dict[str, dict], through: str) -> dict:
     """The compact reading recorded at each refresh."""
     return {
@@ -446,6 +478,7 @@ def build_site(
         "clock": _clock_view(data["clock"], through),
         "incidents": _incident_view(data["incidents"]),
         "surveys": _survey_view(data["surveys"]),
+        "events": _events_view(data["events"]),
         "through": through_str,
         "through_label": trend.date_of(through).strftime("%-d %B %Y"),
         "accelerating": accel,

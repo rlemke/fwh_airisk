@@ -57,6 +57,37 @@
   </div>
 </section>
 
+<section class="panel section" id="blamed">
+  <div class="panel-head"><h2>Outages and hacks blamed on AI</h2><span class="t">Hand-curated from news reports, as of {{ events.as_of }}. Each row keeps apart what happened, the cause the organisation states, and who links it to AI.</span></div>
+  <div class="pad" style="font-size:14px">
+    {% set w = events.wave %}
+    <p style="margin:0 0 .6rem">Between 12 and 17 November 2026, {{ w|length }} large outages hit in a row: {% for e in w|reverse %}{{ e.org }}{% if not loop.last %}, {% endif %}{% endfor %}. <b>None has an official AI cause.</b> Each organisation blames its own bug, update, maintenance or router, and officials say none was a cyberattack and that they are not connected. The AI explanations range from speculation, such as the Homeland Security Secretary passing on a theory that "it's the SI" (superintelligence), to an anonymously sourced claim that rushed patches for flaws found by AI overloaded systems. The Director of National Intelligence tied the NSA outage to patching for a PHP vulnerability. AI-assisted research had found PHP flaws that autumn.</p>
+    <p style="margin:0">The clearest AI harms of the year are elsewhere: in {{ events.counts['ai-acted'] }} cases an AI system acted on its own and its maker said so, and in {{ events.counts['ai-used'] }} investigators, the FBI among them, say attackers used AI tools to do the work. These are events, not a rate, so they are not on the pace board. They are what the <a href="data.html#cybench">hacking benchmark</a> measures in the lab, showing up in the world.</p>
+  </div>
+  <div class="legend" style="padding-top:0">{% for k, label, meaning, badge, n in events.links %}<span title="{{ meaning }}"><span class="v v-{{ badge }}">{{ label }}</span> {{ n }}</span>{% endfor %}</div>
+  <div class="overflow-x">
+  <table class="dtable">
+    <thead><tr><th>Date</th><th>What happened</th><th>Stated cause</th><th>The AI link</th></tr></thead>
+    <tbody>
+    {% for e in events.events %}
+      <tr>
+        <td class="num">{{ e.date }}<div class="t">{{ e.sector }}</div></td>
+        <td style="min-width:220px"><b>{{ e.org }}</b>: {{ e.title }}<div class="t">{{ e.what }}</div></td>
+        <td class="t" style="min-width:200px;color:var(--text-2)">{{ e.stated }}</td>
+        <td style="min-width:240px"><span class="v v-{{ e.badge }}" title="{{ e.meaning }}">{{ e.label }}</span><div class="t" style="margin-top:.3rem;color:var(--text-2)">{{ e.ai }}</div>
+          <div class="t" style="margin-top:.3rem">{% for s in e.sources %}<a href="{{ s.url }}">{{ s.outlet }}</a>{% if not loop.last %} · {% endif %}{% endfor %}</div></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  <div class="pad t" style="font-size:13px;color:var(--text-2)">
+    <b>Context.</b>
+    {% for c in events.context %}{{ c.text }} <a href="{{ c.url }}">source</a>{% if not loop.last %}<br>{% endif %}{% endfor %}
+  </div>
+  <div class="pad t" style="padding-top:0">Causes still under investigation can change. The FAA's root-cause search and Microsoft's final report were not public when this was written. A row moves up or down the scale when the evidence does. The AI Incident Database count below is separate and includes these events only once they are reported there.</div>
+</section>
+
 <div class="grid2 section">
 <section class="panel">
   <div class="panel-head"><h2>When the trend lines cross the next milestones</h2></div>
